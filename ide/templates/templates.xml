@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="true" context="org.scala-ide.sdt.core.templates" deleted="false" description="lazy val" enabled="false" id="scala.templates.lazy" name="lazy">lazy val ${name} = new ${type}(${cursor})</template></templates>

@@ -1,0 +1,4 @@
+<plc-configuration>
+	<verbose>false</verbose>
+	<port>9005</port>
+</plc-configuration>

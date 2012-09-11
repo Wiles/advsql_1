@@ -1,0 +1,22 @@
+Advanced SQL Assignment #1
+Sept. 10, 2012
+
+# Overview #
+This assignment is comprised of two components:
+  - PLC Emulator
+  - Client Webserver
+
+# Setup Procedure #
+
+
+# Directory Structure #
+
+/
+  docs/     - Documentation
+  projects/ - PLC and Client projects
+  scripts/  - Scripts for easy setup
+  ide/      - Resource files for IDE setup
+
+# Authors #
+Samuel Lewis
+Hekar Khani

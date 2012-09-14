@@ -1,8 +1,9 @@
 /**
- * File: FileUtils.scala
- * Author(s): Hekar Khani
- * Date: September 10, 2012
- * Description:
+ * FILE: FileUtils.scala
+ * PROJECT: Advanced SQL #1
+ * PROGRAMMER: Hekar Khani
+ * FIRST VERSION: September 10, 2012
+ * DESCRIPTION:
  * 	Miscellaneous File utilities
  */
 

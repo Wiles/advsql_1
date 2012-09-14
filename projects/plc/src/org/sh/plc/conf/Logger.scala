@@ -1,8 +1,9 @@
 /**
- * File: Logger.scala
- * Author(s): Hekar Khani
- * Date: September 10, 2012
- * Description:
+ * FILE: Logger.scala
+ * PROJECT: Advanced SQL #1
+ * PROGRAMMER: Hekar Khani
+ * FIRST VERSION: September 10, 2012
+ * DESCRIPTION:
  * 	As third party libraries (besides Scala) will 
  * 	most likely not be included in this project,
  *  we have to create a crappy logger.

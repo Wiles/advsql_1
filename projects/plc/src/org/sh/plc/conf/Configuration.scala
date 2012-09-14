@@ -1,8 +1,9 @@
 /**
- * File: Configuration.scala
- * Author(s): Hekar Khani
- * Date: September 10, 2012
- * Description:
+ * FILE: Configuration.scala
+ * PROJECT: Advanced SQL #1
+ * PROGRAMMER: Hekar Khani
+ * FIRST VERSION: September 10, 2012
+ * DESCRIPTION:
  * 	Contains the necessary contents for a configuration file
  */
 package org.sh.plc.conf

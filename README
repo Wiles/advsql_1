@@ -13,9 +13,22 @@ This assignment is comprised of two components:
 
 /
   docs/     - Documentation
-  projects/ - PLC and Client projects
+  projects/ - PLC and Server projects
+    plc/ - PLC service project. Contains a Socket Server
+    server/ - Server project. contains a web interface and backend
   scripts/  - Scripts for easy setup
   ide/      - Resource files for IDE setup
+
+# Start PLC service #
+
+- Simply run the program through Eclipse (import the Eclipse launch configuration)
+or
+- Run the program from the command line (compile, setup the classpath and java -cp "..." org.sh.plc.Main)
+
+# Start Server #
+
+1. Download and add Play 2.0.x to your $PATH or %PATH%
+2. type "play run" in your console
 
 # Authors #
 Samuel Lewis

@@ -14,9 +14,16 @@ import java.io._
 import java.net._
 import java.util._
 import org.sh.plc.conf._
+import org.sh.plc._
 
 object PlcServer {
 
+  private var plc = Array(new PlcEmulator(5.0), new PlcEmulator(10.0), new PlcEmulator(15.0))
+  
+  def getPLC(index: Int): PlcEmulator = {
+    plc(index)
+  }
+  
   def start(socketProcessor: SocketProcessor): Unit = {
     try {
       val listener = new ServerSocket(9999)
@@ -46,6 +53,8 @@ case class ServerThread(val socket: Socket,
 
       val line = in.readLine()
       val response = socketProcessor.request(new SocketRequest(line))
+      
+      out.write(response.content.getBytes())
       
       out.close()
       in.close()

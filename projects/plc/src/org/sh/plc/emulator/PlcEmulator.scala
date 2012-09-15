@@ -9,6 +9,15 @@
 
 package org.sh.plc
 
+import java.util.Date
+
 class PlcEmulator(val tickRate: Double) {
-	
+  
+  private var lastRead = new Date().getTime()
+	def read() : Long = {
+	  var curTime = new Date().getTime()
+	  var oldTime = lastRead
+	  lastRead = curTime
+	  (((curTime - oldTime) * tickRate)/1000L).asInstanceOf[Long]
+	}
 }

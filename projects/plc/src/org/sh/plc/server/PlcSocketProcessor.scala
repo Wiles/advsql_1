@@ -25,7 +25,7 @@ trait SocketProcessorComponent extends PlcManagerComponent {
 
   sealed class PlcSocketProcessor extends SocketProcessor {
     
-    private def readResponse(plc: Int, pulses: Int): SocketResponse = {
+    private def readResponse(plc: Int, pulses: Long): SocketResponse = {
       new SocketResponse("R|" + plc + "|" + pulses + "\r\n")
     }
     
@@ -46,15 +46,15 @@ trait SocketProcessorComponent extends PlcManagerComponent {
     				errorResponse()
     			} else {
     				//TODO: get actual pulse count for PLC
-    				readResponse(plc, 10)
+    				readResponse(plc, PlcServer.getPLC(plc).read)
     			}
+    		} else {
+    				errorResponse()
     		}
         } catch {
         case e: Exception =>
             return errorResponse()
         }
-
-        errorResponse()
       } else {
         errorResponse()
       }

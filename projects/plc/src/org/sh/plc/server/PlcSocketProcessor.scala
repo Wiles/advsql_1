@@ -10,6 +10,7 @@
 package org.sh.plc.server
 
 import org.sh.plc.manager._
+import scala.util.Random
 
 class SocketResponse(val content: String)
 
@@ -23,20 +24,30 @@ trait SocketProcessorComponent extends PlcManagerComponent {
   val socketProcessor: SocketProcessor = new PlcSocketProcessor()
 
   sealed class PlcSocketProcessor extends SocketProcessor {
+    
+    private def readResponse(plc: Int, pulses: Int): SocketResponse = {
+      new SocketResponse("R|" + plc + "|" + pulses + "\r\n")
+    }
+    
     private def errorResponse(): SocketResponse = {
       new SocketResponse("F\r\n")
     }
 
     def request(request: SocketRequest): SocketResponse = {
       val line = request.content
-      val query = line.split("|")
+      val query = line.split("\\|")
 
       if (query.length == 2) {
         try {
         	val command = query(0)
     		val plc = query(1).toInt
-    		if (command == "query") {
-    			
+    		if (command == "R") {
+    			if ( Random.nextInt % 100 == 0 ) {
+    				errorResponse()
+    			} else {
+    				//TODO: get actual pulse count for PLC
+    				readResponse(plc, 10)
+    			}
     		}
         } catch {
         case e: Exception =>

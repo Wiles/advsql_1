@@ -16,7 +16,7 @@ import java.util.Date
  * @param tickRate
  */
 class PlcEmulator(val tickRate: Double) {
-
+  require(tickRate > 0)
   /**
    * Time of last read
    */

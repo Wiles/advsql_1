@@ -75,7 +75,7 @@ trait SocketProcessorComponent extends PlcManagerComponent {
               // Send an error response on every 100th request
               errorResponse()
             } else {
-              readResponse(plc, plcManager.getId(plc).energyUsage)
+              readResponse(plc + 1, plcManager.byId(plc).energyUsage)
             }
           } else {
             errorResponse()

@@ -1,11 +1,10 @@
 package org.sh.plc.manager
 
-
 import org.sh.plc.conf.Configuration
 import scala.collection.mutable.ArrayBuffer
 import org.sh.plc.emulator.PlcEmulator
 
-trait PlcManager {
+sealed trait PlcManager {
   def all(): Array[PlcEmulator]
   def byId(plcId: Int): PlcEmulator
   def exists(plcId: Int): Boolean
@@ -13,24 +12,24 @@ trait PlcManager {
 
 class PlcManagerComponent {
   def plcManager: PlcManager = new DefaultPlcManager()
+  
   private class DefaultPlcManager extends PlcManager {
-    var buffer:ArrayBuffer[PlcEmulator] = new ArrayBuffer()
-    
-    //TODO: Get rates from configuration
-    var t = "10.0,10.0,10.0".split(",")
-    for ( rate <-  t ) {
+    var buffer: ArrayBuffer[PlcEmulator] = new ArrayBuffer()
+
+    for (rate <- Configuration.rates) {
       buffer += new PlcEmulator(rate.toDouble)
     }
-    val plcs : Array[PlcEmulator] = buffer.toArray
-        
-    def all() = plcs
     
-    def byId(plcId: Int): PlcEmulator = {
+    val plcs: Array[PlcEmulator] = buffer.toArray
+
+    override def all() = plcs
+
+    override def byId(plcId: Int): PlcEmulator = {
       plcs(plcId)
     }
-    
-    def exists(plcId: Int): Boolean = {
-    	return if (plcId > 0 && plcId < all().size) true else false;
+
+    override def exists(plcId: Int): Boolean = {
+      return if (plcId > 0 && plcId < all().size) true else false;
     }
   }
 }

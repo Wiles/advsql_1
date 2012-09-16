@@ -1,7 +1,7 @@
 /**
  * FILE: Configuration.scala
  * PROJECT: Advanced SQL #1
- * PROGRAMMER: Hekar Khani
+ * PROGRAMMER: Hekar Khani, Samuel Lewis
  * FIRST VERSION: September 10, 2012
  * DESCRIPTION:
  * 	Contains the necessary contents for a configuration file
@@ -14,16 +14,25 @@ import java.util.Properties
 import scala.collection.mutable.LinkedHashMap
 import scala.io.Source
 
+/**
+ * Configuration values for the PLC server
+ */
 sealed trait ConfigurationValues {
   var verbose = false
   var port = 9005
-  var rates = "100.0,100.0,100.0"
+  var rates = Array(100.0, 100.0, 100.0)
 }
 
+/**
+ * Types of configuration files to open
+ */
 private object ConfigurationTypes extends Enumeration {
   val Application, User, Default = Value
 }
 
+/**
+ * Configuration file reader
+ */
 private class ConfigurationReader(val file: File) extends ConfigurationValues {
   
   private var properties = new Properties()
@@ -31,28 +40,59 @@ private class ConfigurationReader(val file: File) extends ConfigurationValues {
   require(file != null)
   require(file.exists())
 
+  /**
+   * Fill in the configuration
+   */
   def fill(c: ConfigurationValues): Unit = {
-    parse(file)
-    c.verbose = true
+    val props = parse(file)
+    
+    c.verbose = props.getProperty("verbose", verbose.toString).equalsIgnoreCase("true")
+    
+    try {
+    	c.port = props.getProperty("port", port.toString).toInt
+    } catch {
+      case e: NumberFormatException => {
+        Logger.log(e, "[Configuration] Failure to parse port number")
+      }
+    }
+    
+    try {
+      if (props.getProperty("rates") != "null") {
+    	  c.rates = props.getProperty("rates").split(",").map(_.toDouble)
+      }
+    } catch {
+      case e: Exception => {
+        Logger.log(e, "[Configuration] Failure to parse rates")
+      }
+    }
   }
 
-  private def parse(file: File): Unit = {
+  /**
+   * Parse a properties file for configuration files
+   */
+  private def parse(file: File): Properties = {
     require(file != null)
-    //TODO Doing this the java way. Not sure if there a better way.
+    
     var propertiesStream : FileInputStream = null
     try {
       propertiesStream = new FileInputStream(file)
       properties.loadFromXML(propertiesStream)
     } catch {
-      case e: FileNotFoundException =>
+      case e: FileNotFoundException => {
+        Logger.log(e)
         throw new Exception("Failure to open file: %s".format(file.getPath()), e)
-      case e: IOException =>
+      }
+      case e: IOException => {
+        Logger.log(e)
         throw new Exception("Error while reading file: %s".format(file.getPath()), e)
+      }
     } finally {
       if (propertiesStream != null) {
         propertiesStream.close()
       }
     }
+    
+    return properties
   }
 }
 
@@ -81,7 +121,7 @@ object Configuration extends ConfigurationValues {
     // Check the application jar itself for the file
     ConfigurationTypes.Default ->
       new File(classOf[ConfigurationValues]
-        .getResource("/org/sh/resource/%s".format(configFilename)).toURI())
+        .getResource("/org/sh/plc/resource/%s".format(configFilename)).toURI())
   )
 
   // Select the first configuration
@@ -98,8 +138,8 @@ object Configuration extends ConfigurationValues {
     
     case Some((ConfigurationTypes.Default, file)) => {
       println("""
-          #"WARNING - Using default configuration file, 
-          # as configuration not found in the following paths: %s""".stripMargin('#')
+          #WARNING - Using default configuration file, 
+          #as configuration not found in the following paths: %s""".stripMargin('#')
         .format(possibleConfigurationFiles
           .filter(_._1 != ConfigurationTypes.Default)
           .map(_._2.getPath())

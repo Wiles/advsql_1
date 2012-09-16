@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-	<verbose>false</verbose>
-	<port>9005</port>
+	<entry key="verbose">false</entry>
+	<entry key="port">9015</entry>
+	<entry key="rates">150.0, 15, -25.55</entry>
 </properties>

@@ -25,4 +25,9 @@ object Logger {
       e.printStackTrace();
     }
   }
+  
+  def log(e: Exception, message: String): Unit = {
+    log(message)
+    log(e)
+  }
 }

@@ -1,7 +1,7 @@
 /**
  * FILE: PlcServer.scala
  * PROJECT: Advanced SQL #1
- * PROGRAMMER: Hekar Khani
+ * PROGRAMMER: Hekar Khani, Samuel Lewis
  * FIRST VERSION: September 10, 2012
  * DESCRIPTION:
  * 	The code in this file handles the server
@@ -19,17 +19,10 @@ import org.sh.plc._
 import org.sh.plc.emulator.PlcEmulator
 
 object PlcServer {
-	//TODO: Replace these with using the PlcManagerComponent
-	private var plc = Array(new PlcEmulator(5.0), new PlcEmulator(10.0), new PlcEmulator(15.0))
-
-	def getPLC(index: Int): PlcEmulator = {
-	  plc(index)
-	}
-  
   def start(socketProcessor: SocketProcessor): Unit = {
     try {
       //TODO get port number from configuration
-      val port = 9999
+      val port = Configuration.port
       System.out.println("Using port: " + port)
       val listener = new ServerSocket(port)
       while (true) {

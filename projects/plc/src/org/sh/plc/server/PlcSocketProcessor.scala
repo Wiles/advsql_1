@@ -40,7 +40,7 @@ trait SocketProcessorComponent extends PlcManagerComponent {
       if (query.length == 2) {
         try {
         	val command = query(0)
-    		val plc = query(1).toInt
+    		val plc = query(1).toInt - 1
     		if (command == "R") {
     			if ( Random.nextInt % 100 == 0 ) {
     				errorResponse()

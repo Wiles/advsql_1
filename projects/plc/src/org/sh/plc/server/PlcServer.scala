@@ -10,23 +10,28 @@
 
 package org.sh.plc.server
 
+import org.sh.plc.manager._
 import java.io._
 import java.net._
 import java.util._
 import org.sh.plc.conf._
 import org.sh.plc._
+import org.sh.plc.emulator.PlcEmulator
 
 object PlcServer {
+	//TODO: Replace these with using the PlcManagerComponent
+	private var plc = Array(new PlcEmulator(5.0), new PlcEmulator(10.0), new PlcEmulator(15.0))
 
-  private var plc = Array(new PlcEmulator(5.0), new PlcEmulator(10.0), new PlcEmulator(15.0))
-  
-  def getPLC(index: Int): PlcEmulator = {
-    plc(index)
-  }
+	def getPLC(index: Int): PlcEmulator = {
+	  plc(index)
+	}
   
   def start(socketProcessor: SocketProcessor): Unit = {
     try {
-      val listener = new ServerSocket(9999)
+      //TODO get port number from configuration
+      val port = 9999
+      System.out.println("Using port: " + port)
+      val listener = new ServerSocket(port)
       while (true) {
         new ServerThread(listener.accept(), socketProcessor).start()
       }

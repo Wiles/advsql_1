@@ -45,7 +45,6 @@ trait SocketProcessorComponent extends PlcManagerComponent {
     			if ( Random.nextInt % 100 == 0 ) {
     				errorResponse()
     			} else {
-    				//TODO: get actual pulse count for PLC
     				readResponse(plc, PlcServer.getPLC(plc).read)
     			}
     		} else {

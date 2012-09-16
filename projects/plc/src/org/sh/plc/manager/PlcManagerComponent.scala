@@ -1,6 +1,9 @@
 package org.sh.plc.manager
-import org.sh.plc.PlcEmulator
-import org.sh.plc.PlcEmulator
+
+
+import org.sh.plc.conf.Configuration
+import scala.collection.mutable.ArrayBuffer
+import org.sh.plc.emulator.PlcEmulator
 
 trait PlcManager {
   def all(): Array[PlcEmulator]
@@ -9,23 +12,25 @@ trait PlcManager {
 }
 
 class PlcManagerComponent {
-  val plcManager: PlcManager = new DefaultPlcManager
-
+  def plcManager: PlcManager = new DefaultPlcManager()
   private class DefaultPlcManager extends PlcManager {
-    val tickRate = 100.0
-    val plcs = Array(new PlcEmulator(tickRate), 
-        new PlcEmulator(tickRate), 
-        new PlcEmulator(tickRate))
+    var buffer:ArrayBuffer[PlcEmulator] = new ArrayBuffer()
+    
+    //TODO: Get rates from configuration
+    var t = "10.0,10.0,10.0".split(",")
+    for ( rate <-  t ) {
+      buffer += new PlcEmulator(rate.toDouble)
+    }
+    val plcs : Array[PlcEmulator] = buffer.toArray
         
     def all() = plcs
     
     def byId(plcId: Int): PlcEmulator = {
-      require(exists(plcId))
       plcs(plcId)
     }
     
     def exists(plcId: Int): Boolean = {
-    	return if (plcId > 0 && plcId < plcs.size) true else false;
+    	return if (plcId > 0 && plcId < all().size) true else false;
     }
   }
 }

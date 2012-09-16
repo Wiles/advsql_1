@@ -7,13 +7,14 @@
  * 	Emulator of the PLC hardware logic
  */
 
-package org.sh.plc
+package org.sh.plc.emulator
 
 import java.util.Date
 
 class PlcEmulator(val tickRate: Double) {
   
   private var lastRead = new Date().getTime()
+  
 	def read() : Long = {
 	  var curTime = new Date().getTime()
 	  var oldTime = lastRead

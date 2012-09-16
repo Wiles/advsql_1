@@ -10,13 +10,14 @@ package org.sh.plc.conf
 
 import java.io._
 import java.net._
+import java.util.Properties
 import scala.collection.mutable.LinkedHashMap
 import scala.io.Source
-import org.sh.plc.utils.FileUtils
 
 sealed trait ConfigurationValues {
   var verbose = false
   var port = 9005
+  var rates = "100.0,100.0,100.0"
 }
 
 private object ConfigurationTypes extends Enumeration {
@@ -24,6 +25,9 @@ private object ConfigurationTypes extends Enumeration {
 }
 
 private class ConfigurationReader(val file: File) extends ConfigurationValues {
+  
+  private var properties = new Properties()
+      
   require(file != null)
   require(file.exists())
 
@@ -34,16 +38,20 @@ private class ConfigurationReader(val file: File) extends ConfigurationValues {
 
   private def parse(file: File): Unit = {
     require(file != null)
-
+    //TODO Doing this the java way. Not sure if there a better way.
+    var propertiesStream : FileInputStream = null
     try {
-      val contents = FileUtils.readFile(file)
-      
-      // TODO: Parse XML
+      propertiesStream = new FileInputStream(file)
+      properties.loadFromXML(propertiesStream)
     } catch {
       case e: FileNotFoundException =>
         throw new Exception("Failure to open file: %s".format(file.getPath()), e)
       case e: IOException =>
         throw new Exception("Error while reading file: %s".format(file.getPath()), e)
+    } finally {
+      if (propertiesStream != null) {
+        propertiesStream.close()
+      }
     }
   }
 }

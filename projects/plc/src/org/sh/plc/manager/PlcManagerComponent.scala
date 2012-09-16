@@ -10,26 +10,30 @@ sealed trait PlcManager {
   def exists(plcId: Int): Boolean
 }
 
-class PlcManagerComponent {
-  def plcManager: PlcManager = new DefaultPlcManager()
-  
-  private class DefaultPlcManager extends PlcManager {
-    var buffer: ArrayBuffer[PlcEmulator] = new ArrayBuffer()
+private class DefaultPlcManager extends PlcManager {
+  var buffer: ArrayBuffer[PlcEmulator] = new ArrayBuffer()
 
-    for (rate <- Configuration.rates) {
-      buffer += new PlcEmulator(rate.toDouble)
-    }
-    
-    val plcs: Array[PlcEmulator] = buffer.toArray
-
-    override def all() = plcs
-
-    override def byId(plcId: Int): PlcEmulator = {
-      plcs(plcId)
-    }
-
-    override def exists(plcId: Int): Boolean = {
-      return if (plcId > 0 && plcId < all().size) true else false;
-    }
+  for (rate <- Configuration.rates) {
+    buffer += new PlcEmulator(rate.toDouble)
   }
+
+  val plcs: Array[PlcEmulator] = buffer.toArray
+
+  override def all() = plcs
+
+  override def byId(plcId: Int): PlcEmulator = {
+    plcs(plcId)
+  }
+
+  override def exists(plcId: Int): Boolean = {
+    return if (plcId > 0 && plcId < all().size) true else false;
+  }
+}
+
+object PlcManagerComponent {
+  lazy val instance: PlcManager = new DefaultPlcManager()
+}
+
+class PlcManagerComponent {
+  val plcManager = PlcManagerComponent.instance
 }

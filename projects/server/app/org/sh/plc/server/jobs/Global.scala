@@ -23,6 +23,7 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     JobScheduler.onStart(app)
+    DatabaseSetup.onStart(app)
   }
   
   override def onStop(app: Application) {

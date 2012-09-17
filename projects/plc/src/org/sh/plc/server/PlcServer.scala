@@ -10,20 +10,27 @@
 
 package org.sh.plc.server
 
-import org.sh.plc.manager._
 import java.io._
 import java.net._
 import java.util._
-import org.sh.plc.conf._
 import org.sh.plc._
-import org.sh.plc.emulator.PlcEmulator
+import org.sh.plc.conf._
+import org.sh.plc.manager._
+import org.sh.plc.emulator._
 
+/**
+ * 
+ */
 object PlcServer {
+  /**
+   * 
+   */
   def start(socketProcessor: SocketProcessor): Unit = {
     try {
-      //TODO get port number from configuration
       val port = Configuration.port
-      System.out.println("Using port: " + port)
+      
+      Logger.log("Using port: %s".format(port))
+      
       val listener = new ServerSocket(port)
       while (true) {
         new ServerThread(listener.accept(), socketProcessor).start()
@@ -39,18 +46,20 @@ object PlcServer {
 
 }
 
-case class ServerThread(val socket: Socket, 
+/**
+ * Thread to handle client request
+ */
+class ServerThread(val socket: Socket, 
     val socketProcessor: SocketProcessor) extends Thread("ServerThread") {
 
   override def run(): Unit = {
-    val rand = new Random(System.currentTimeMillis())
     try {
       val out = new DataOutputStream(socket.getOutputStream())
       val in = new BufferedReader(
         new InputStreamReader(socket.getInputStream()))
 
-      val line = in.readLine()
-      val response = socketProcessor.request(new SocketRequest(line))
+      val request = new SocketRequest(in.readLine())
+      val response = socketProcessor.request(request)
       
       out.write(response.content.getBytes())
       

@@ -12,7 +12,6 @@ import java.io._
 import java.net._
 import java.util.Properties
 import scala.collection.mutable.LinkedHashMap
-import scala.io.Source
 
 /**
  * Configuration values for the PLC server
@@ -35,8 +34,6 @@ private object ConfigurationTypes extends Enumeration {
  */
 private class ConfigurationReader(val file: File) extends ConfigurationValues {
   
-  private var properties = new Properties()
-      
   require(file != null)
   require(file.exists())
 
@@ -72,6 +69,8 @@ private class ConfigurationReader(val file: File) extends ConfigurationValues {
    */
   private def parse(file: File): Properties = {
     require(file != null)
+    
+    val properties = new Properties()
     
     var propertiesStream : FileInputStream = null
     try {

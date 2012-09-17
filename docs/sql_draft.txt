@@ -1,0 +1,18 @@
+plc
+id	primary key auto
+name	varchar(256)
+
+plc_event
+id	primary key auto
+plc	references(plc)
+status	references(plc_status)
+start	timestamp
+end	timestamp
+
+plc_status
+id	primary key auto
+name	varchar(128)
+
+plc_settings
+key	primary key varchar(64)
+value	varchar(256)

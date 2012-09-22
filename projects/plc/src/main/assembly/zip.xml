@@ -1,0 +1,28 @@
+<assembly>
+  <id>zip</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <files>
+    <file>
+      <source>src/main/config/README.txt</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <source>src/main/config/plc-configuration.xml</source>
+      <outputDirectory>/config</outputDirectory>
+    </file>
+    <file>
+      <source>target/plc_server-${version}.jar</source>
+			<destName>plc_server.jar</destName>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+    </file>
+    <file>
+      <source>src/main/config/run.bat</source>
+      <outputDirectory>/</outputDirectory>
+      <filtered>false</filtered>
+    </file>
+	</files>
+</assembly>

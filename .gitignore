@@ -12,3 +12,5 @@
 *.tmp
 
 .cache
+
+dependency-reduced-pom.xml

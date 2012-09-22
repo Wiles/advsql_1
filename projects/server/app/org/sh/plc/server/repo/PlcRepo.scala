@@ -96,7 +96,7 @@ trait PlcRepo {
   def putSetting(key: String, value: String): Unit = {
     DB.withConnection {
       implicit c =>
-        val value = SQL(
+        SQL(
           """
             |merge into plc_setting t
             |using select {key} as key, {value} as value from dual a

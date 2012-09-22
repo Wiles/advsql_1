@@ -20,7 +20,12 @@ import scala.collection.immutable.Map
 
 object DatabaseSetup {
   def onStart(app: Application): Unit = {
+    setup()
+  }
+
+  def setup(): Unit = {
     setupTables()
+    setupDemoData()
   }
 
   def setupTables(): Unit = {
@@ -32,33 +37,14 @@ object DatabaseSetup {
   }
 
   def createNonExistantTableSql(tables: Map[String, String]): String = {
-    val template = """
-                     |create table %s
-                     |(
-                     	 |	%s
-                     |);
-                   """.stripMargin
+    val template = "create table if not exists %s (%s);"
 
     DB.withConnection {
       implicit c =>
       // Find out which tables exist and which of them do not
       // Create the DDL for creating the tables that do not exist
         val ddl = tables
-          .withFilter {
-          case (key, value) =>
-            val count = SQL( """
-	            select count(*) as c from information_schema.tables 
-	            where table_schema={table_schema} and table_name={table_name}
-                             	        """)
-              .on(
-              "table_name" -> key,
-              "table_schema" -> value
-            )
-              .as(scalar[Long].single)
-
-            val tableExists = count < 1
-            tableExists
-        }.map {
+          .map {
           case (key, value) =>
             template.format(key, value)
         }.mkString("", "\n", "\n")
@@ -67,7 +53,7 @@ object DatabaseSetup {
     }
   }
 
-  def setupPlcs(): Unit = {
+  def setupDemoData(): Unit = {
     def setup(items: Map[Int, String], insertTemplate: String, countStatement: String): Unit = {
       DB.withConnection {
         implicit c =>
@@ -75,27 +61,25 @@ object DatabaseSetup {
             .withFilter {
             case (key, value) =>
               val count = SQL(countStatement)
-              .on(
+                .on(
                 "id" -> key,
                 "name" -> value
               ).as(scalar[Long].single)
 
-              count > 0
+              count <= 0
           }.map {
             case (key, value) =>
               insertTemplate.format(key, value)
           }.mkString("")
 
-          SQL.execute(ddl)
+          SQL(ddl).execute()
       }
     }
 
-    setup(plcs, "insert into plc(id, name) values(%d, '%s');", """
-        select count(*) as c from play.plc
-	      where id={id} and name={name}""")
+    setup(plcs, "insert into plc(id, name) values(%d, '%s');",
+      "select count(*) as c from plc where id={id} and name={name}")
 
-    setup(statuses, "insert into plc_status(id, name) values(%d, '%s');", """
-        select count(*) as c from play.plc_status
-	      where id={id} and name={name}""")
+    setup(statuses, "insert into plc_status(id, name) values(%d, '%s');",
+      "select count(*) as c from plc_status where id={id} and name={name}")
   }
 }

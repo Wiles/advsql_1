@@ -20,7 +20,7 @@ import org.sh.plc.server.model._
  */
 class PlcCommunicator {
 
-  def energyUsage(plcId: Int): EnergyUsage = {
+  def energyUsage(plcId: Long): EnergyUsage = {
     
     var in: DataInputStream = null
     var out: BufferedWriter = null

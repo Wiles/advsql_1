@@ -8,7 +8,7 @@
  */
 package org.sh.plc.server.repo
 
-import java.sql._
+import java.sql.{Array => _}
 import anorm._
 import play.api.Play._
 import play.api.db._
@@ -40,7 +40,8 @@ trait PlcRepo {
   
   def listPlcs(): Array[Int] = {
     DB.withConnection { implicit c =>
-      SQL("select * from plc")
+      //SQL("select * from plc").execute()
+      Array(0)
     }
   }
 

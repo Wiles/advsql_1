@@ -1,6 +1,7 @@
 package org.sh.plc.server.jobs
 
 import anorm._
+import anorm.SqlParser._
 import play.api._
 import play.api.Play._
 import play.api.db._
@@ -14,11 +15,13 @@ object DatabaseSetup {
 	  id long primary key auto_increment,
 	  name varchar(256) not null
 	""",
+	
     "plc_status" ->
       """
 	  id long primary key auto_increment,
 	  name varchar(128) not null
 	""",
+	
     "plc_event" ->
       """
 	  id long primary key auto_increment,
@@ -27,6 +30,7 @@ object DatabaseSetup {
 	  start date not null,
 	  end date not null
 	""",
+	
     "plc_settings" ->
       """
 	  key varchar(64) primary key,
@@ -34,32 +38,42 @@ object DatabaseSetup {
 	"""
   )
 
-  def onStart(app: Application): Unit = createNonExistantTables()
+  def onStart(app: Application): Unit = {
+    createNonExistantTableSql(tables)
+  }
 
-  private def createNonExistantTables(): Unit = {
+  def createNonExistantTableSql(tables: Map[String, String]): String = {
     val template = """
       create table %s
       (
     		%s
       );
+      
     """
 
     DB.withConnection { implicit c =>
-      tables
+      val ddl = tables
         .withFilter {
           case (key, value) =>
-            val result: Boolean = SQL("""
-	            select count(*) from information_schema.tables 
+            val count = SQL("""
+	            select count(*) as c from information_schema.tables 
 	            where table_schema={table_schema} and table_name={table_name}
 	        """)
-	        .on("table_schema" -> key,
+	        .on("table_name" -> key,
 	            "table_schema" -> value
             )
-	        .execute()
-	       
+	        .as(scalar[Long].single)
+	        
+	        val tableExists = count < 1
+	        tableExists
         }
-        .map { case (key, value) => template.format(key, value) }
+        .map { 
+          case (key, value) => 
+            template.format(key, value)
+        }
         .mkString("", "\n", "\n")
+        
+        ddl
     }
   }
 }

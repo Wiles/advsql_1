@@ -15,6 +15,7 @@ import anorm.SqlParser._
 import play.api.Play._
 import play.api.db._
 import org.sh.plc.server.model._
+import org.sh.plc.server.jobs.DatabaseSetupConstants
 
 /**
  * Repository containing functions that deal on the plc event table
@@ -32,8 +33,11 @@ trait PlcRepo {
   def logEnergyUsage(plc: Int, usage: EnergyUsage): Unit = {
     DB.withConnection {
       implicit c =>
-        SQL("insert into plc_event(plc, usage, start, end) values({plc}, {usage}, {start}, {end})")
+        SQL( """
+               insert into plc_event(plc, status, usage, start, end)
+               values({plc}, {status}, {usage}, {start}, {end})""")
           .on("plc" -> plc)
+          .on("status" -> DatabaseSetupConstants.statuses("Failure"))
           .on("usage" -> usage.usage)
           .on("start" -> usage.start)
           .on("end" -> usage.end)
@@ -53,10 +57,10 @@ trait PlcRepo {
     }
   }
 
-  def findConsumptionByPlc(plcId: Int, start: Timestamp, end: Timestamp): Double  = {
+  def findConsumptionByPlc(plcId: Int, start: Timestamp, end: Timestamp): Double = {
     DB.withConnection {
       implicit c =>
-        SQL("")
+        SQL("select * from plc_event where plc={plcId} and ")
     }
     0.0
   }
@@ -96,19 +100,23 @@ trait PlcRepo {
   def putSetting(key: String, value: String): Unit = {
     DB.withConnection {
       implicit c =>
-        SQL(
-          """
-            |merge into plc_setting t
-            |using select {key} as key, {value} as value from dual a
-            |on t.key=a.key
-            |when matched
-            | update set value=a.value where key=a.key
-            |when not matched
-            | insert (key, value) values(a.key, a.value)
-          """.stripMargin)
-        .on("key" -> key,
-          "value" -> value)
-        .execute()
+      // H2 does not have a proper merge statement,
+      // so we'll need to check the number of rows
+      // modified instead
+        val rowsAltered = SQL(
+          "update plc_setting set value={value} where key={key}"
+        ).on("key" -> key,
+          "value" -> value
+        ).executeUpdate()
+
+        if (rowsAltered <= 0) {
+          // Perform the insert
+          val rowsAltered = SQL(
+            "insert into plc_setting(key, value) values({key}, {value})"
+          ).on("key" -> key,
+            "value" -> value
+          ).executeInsert()
+        }
     }
   }
 }

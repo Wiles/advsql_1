@@ -4,8 +4,8 @@
  * PROGRAMMER: Hekar Khani
  * FIRST VERSION: September 13, 2012
  * DESCRIPTION:
- * 	Constants dealing with the automatic initialization of the
- * 	database schema
+ * Constants dealing with the automatic initialization of the
+ * database schema
  */
 package org.sh.plc.server.jobs
 
@@ -32,11 +32,12 @@ object DatabaseSetupConstants {
 	  id long primary key auto_increment,
 	  plc long references plc(id),
 	  status long references plc_status(id),
+    usage long not null,
 	  start date not null,
 	  end date not null
       	""",
 
-    "plc_settings" ->
+    "plc_setting" ->
       """
 	  key varchar(64) primary key,
 	  value varchar(256)
@@ -44,19 +45,19 @@ object DatabaseSetupConstants {
   )
 
   /**
-   * ID -> PLC name
+   * PLC name -> ID
    */
   val plcs = Map(
-    0 -> "Plc_1",
-    1 -> "Plc_2",
-    2 -> "Plc_3"
+    "Plc_1" -> 0,
+    "Plc_2" -> 1,
+    "Plc_3" -> 2
   )
 
   /**
-   * ID -> Status name
+   * Status name -> ID
    */
   val statuses = Map(
-    0 -> "Valid",
-    1 -> "Failure"
+    "Valid" -> 0,
+    "Failure" -> 1
   )
 }

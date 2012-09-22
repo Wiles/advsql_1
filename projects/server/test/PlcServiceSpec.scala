@@ -16,10 +16,12 @@ import org.sh.plc.server.jobs.DatabaseSetup
 import org.sh.plc.server.model.EnergyUsage
 import org.sh.plc.server.services.PlcServices
 
-class PlcServiceSpec extends Specification with BeforeAndAfter {
+class PlcServiceSpec extends Specification with Before {
 
-  before {
-    DatabaseSetup.setup()
+  def before() = {
+    running(FakeApplication()) {
+      DatabaseSetup.setup()
+    }
   }
 
   "plcs" should {
@@ -46,7 +48,9 @@ class PlcServiceSpec extends Specification with BeforeAndAfter {
             new Timestamp(Calendar.getInstance().getTime().getTime())
           )
 
-          logEnergyUsage(0, usage)
+          PlcServices.logEnergyUsage(0, usage)
+
+          true
         }
       }
     }

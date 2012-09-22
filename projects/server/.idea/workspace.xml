@@ -57,40 +57,13 @@
     <favorites_list name="server" />
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.5">
+    <splitter split-orientation="horizontal" split-proportion="0.51294243">
       <split-first>
         <leaf>
           <file leaf-file-name="EnergyUsage.scala" pinned="false" current="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/model/EnergyUsage.scala">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="21" column="32" selection-start="458" selection-end="461" vertical-scroll-proportion="0.57337886">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="PlcCommunicator.scala" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/communicator/PlcCommunicator.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="40" column="17" selection-start="937" selection-end="937" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="DatabaseSetup.scala" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/jobs/DatabaseSetup.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="72" column="24" selection-start="1795" selection-end="1795" vertical-scroll-proportion="0.0">
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="PlcRepo.scala" pinned="false" current="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/repo/PlcRepo.scala">
-              <provider selected="true" editor-type-id="text-editor">
-                <state line="44" column="37" selection-start="1013" selection-end="1013" vertical-scroll-proportion="0.0">
+                <state line="13" column="23" selection-start="260" selection-end="260" vertical-scroll-proportion="0.35494882">
                   <folding />
                 </state>
               </provider>
@@ -100,10 +73,10 @@
       </split-first>
       <split-second>
         <leaf>
-          <file leaf-file-name="PlcServiceSpec.scala" pinned="false" current="true" current-in-tab="true">
+          <file leaf-file-name="PlcServiceSpec.scala" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/test/PlcServiceSpec.scala">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="25" column="20" selection-start="585" selection-end="585" vertical-scroll-proportion="0.5085324">
+                <state line="12" column="22" selection-start="273" selection-end="273" vertical-scroll-proportion="0.0">
                   <folding />
                 </state>
               </provider>
@@ -112,7 +85,7 @@
           <file leaf-file-name="DatabaseSetupSpec.scala" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/test/DatabaseSetupSpec.scala">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="14" column="0" selection-start="330" selection-end="330" vertical-scroll-proportion="0.0">
+                <state line="13" column="26" selection-start="305" selection-end="305" vertical-scroll-proportion="0.0">
                   <folding />
                 </state>
               </provider>
@@ -121,7 +94,16 @@
           <file leaf-file-name="PlcSettingSpec.scala" pinned="false" current="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/test/PlcSettingSpec.scala">
               <provider selected="true" editor-type-id="text-editor">
-                <state line="0" column="0" selection-start="0" selection-end="148" vertical-scroll-proportion="0.0">
+                <state line="19" column="3" selection-start="468" selection-end="468" vertical-scroll-proportion="0.0">
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="PlcRepo.scala" pinned="false" current="true" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/repo/PlcRepo.scala">
+              <provider selected="true" editor-type-id="text-editor">
+                <state line="67" column="5" selection-start="1590" selection-end="1590" vertical-scroll-proportion="0.7482679">
                   <folding />
                 </state>
               </provider>
@@ -147,15 +129,16 @@
     <option name="changedFiles">
       <list>
         <option value="$PROJECT_DIR$/app/controllers/Application.scala" />
-        <option value="$PROJECT_DIR$/app/org/sh/plc/server/jobs/DatabaseSetupConstants.scala" />
         <option value="$PROJECT_DIR$/app/org/sh/plc/server/model/EnergyUsage.scala" />
         <option value="$PROJECT_DIR$/app/org/sh/plc/server/communicator/PlcCommunicator.scala" />
         <option value="$PROJECT_DIR$/test/PlcSettingsSpec.scala" />
-        <option value="$PROJECT_DIR$/test/PlcSettingSpec.scala" />
         <option value="$PROJECT_DIR$/test/DatabaseSetupSpec.scala" />
-        <option value="$PROJECT_DIR$/app/org/sh/plc/server/repo/PlcRepo.scala" />
-        <option value="$PROJECT_DIR$/app/org/sh/plc/server/jobs/DatabaseSetup.scala" />
         <option value="$PROJECT_DIR$/test/PlcServiceSpec.scala" />
+        <option value="$PROJECT_DIR$/app/org/sh/plc/server/jobs/DatabaseSetup.scala" />
+        <option value="$PROJECT_DIR$/conf/application.conf" />
+        <option value="$PROJECT_DIR$/app/org/sh/plc/server/jobs/DatabaseSetupConstants.scala" />
+        <option value="$PROJECT_DIR$/test/PlcSettingSpec.scala" />
+        <option value="$PROJECT_DIR$/app/org/sh/plc/server/repo/PlcRepo.scala" />
       </list>
     </option>
   </component>
@@ -350,6 +333,20 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="project" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="server" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="server" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="conf" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -805,58 +802,72 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/jobs/DatabaseSetupConstants.scala">
+    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/services/PlcServices.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="57" column="2" selection-start="1009" selection-end="1009" vertical-scroll-proportion="0.6996587">
+        <state line="0" column="3" selection-start="3" selection-end="3" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/DatabaseSetupSpec.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="0" selection-start="330" selection-end="330" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/PlcSettingSpec.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="148" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/communicator/PlcCommunicator.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="17" selection-start="937" selection-end="937" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/jobs/DatabaseSetup.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="72" column="24" selection-start="1795" selection-end="1795" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/repo/PlcRepo.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="37" selection-start="1013" selection-end="1013" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/model/EnergyUsage.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="21" column="32" selection-start="458" selection-end="461" vertical-scroll-proportion="0.57337886">
+        <state line="13" column="26" selection-start="305" selection-end="305" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/PlcServiceSpec.scala">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="20" selection-start="585" selection-end="585" vertical-scroll-proportion="0.5085324">
+        <state line="12" column="22" selection-start="273" selection-end="273" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/PlcSettingSpec.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="3" selection-start="468" selection-end="468" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/jobs/DatabaseSetupConstants.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="12" selection-start="783" selection-end="783" vertical-scroll-proportion="0.70422536">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/jobs/DatabaseSetup.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="64" column="29" selection-start="1574" selection-end="1574" vertical-scroll-proportion="0.36258662">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/communicator/PlcCommunicator.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="0" selection-start="415" selection-end="415" vertical-scroll-proportion="0.45392492">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/conf/application.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="40" selection-start="741" selection-end="741" vertical-scroll-proportion="0.27713627">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/model/EnergyUsage.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="23" selection-start="260" selection-end="260" vertical-scroll-proportion="0.35494882">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/app/org/sh/plc/server/repo/PlcRepo.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="67" column="5" selection-start="1590" selection-end="1590" vertical-scroll-proportion="0.7482679">
           <folding />
         </state>
       </provider>

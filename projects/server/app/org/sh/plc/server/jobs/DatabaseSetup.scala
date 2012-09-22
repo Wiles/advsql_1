@@ -54,7 +54,7 @@ object DatabaseSetup {
   }
 
   def setupDemoData(): Unit = {
-    def setup(items: Map[Int, String], insertTemplate: String, countStatement: String): Unit = {
+    def setup(items: Map[String, Int], insertTemplate: String, countStatement: String): Unit = {
       DB.withConnection {
         implicit c =>
           val ddl = items
@@ -62,8 +62,8 @@ object DatabaseSetup {
             case (key, value) =>
               val count = SQL(countStatement)
                 .on(
-                "id" -> key,
-                "name" -> value
+                "id" -> value,
+                "name" -> key
               ).as(scalar[Long].single)
 
               count <= 0

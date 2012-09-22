@@ -2,10 +2,14 @@ logs
 project/project
 project/target
 target
+.target
 tmp
+bin
 .history
 dist
 *.db
 .settings
 .classpath
 .project
+server.iml
+.idea

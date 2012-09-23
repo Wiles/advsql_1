@@ -8,7 +8,7 @@
  */
 package org.sh.plc.server.repo
 
-import java.sql.{Timestamp}
+import java.sql.{ Timestamp }
 import anorm._
 import anorm.SqlParser._
 
@@ -22,7 +22,7 @@ import org.sh.plc.server.jobs.DatabaseSetupConstants
  */
 object ListTimelyReport extends Enumeration {
   type ListTimelyReport = Value
-  val HOURLY, DAILY, WEEKLY = Value
+  val HOURLY, DAILY, MONTHLY = Value
 }
 
 /**
@@ -41,7 +41,7 @@ trait PlcRepo {
   def logEnergyUsage(plc: Int, usage: EnergyUsage): Unit = {
     DB.withConnection {
       implicit c =>
-        SQL( """
+        SQL("""
                insert into plc_event(plc, status, usage, start, end)
                values({plc}, {status}, {usage}, {start}, {end})""")
           .on("plc" -> plc)
@@ -76,12 +76,11 @@ trait PlcRepo {
         val rows = SQL(
           """select sum(usage), plc from plc_event
             where start <= {start} and end <= {end}
-          group by plc""")
-          .execute()
+          group by plc""")()
 
-        rows
-          .map(new EnergyUsage(_[Long]("usage"), _[Long]("plc"), start, end))
-          .toList()
+        rows.map { row =>
+          new EnergyUsage(row[Long]("plc"), row[Long]("usage"), start, end)
+        }.toList
     }
   }
 
@@ -91,8 +90,44 @@ trait PlcRepo {
    * @param end
    */
   def listTimelyConsumption(style: ListTimelyReport.ListTimelyReport,
-                            start: Timestamp, end: Timestamp): Unit = {
+    start: Timestamp, end: Timestamp): Unit = {
+    DB.withConnection {
+      implicit c =>
+        def query(group: String) = {
+          val rows = SQL(
+            """select 
+        		sum(usage) as usage_sum,
+        		plc,
+        		hour(end) as time_hour, 
+        		day_of_year(end) as time_day, 
+        		month(end) as time_month, 
+        		year(end) as time_year
+            from plc_event
+            where start <= {start} and end <= {end}
+          group by %s""".format(group))()
 
+          rows.map { row =>
+            new TimelyConsumptionRow(
+              row[Long]("plc"),
+              row[Long]("usage"),
+              row[Long]("hour"),
+              row[Long]("dayOfYear"),
+              row[Long]("month"),
+              row[Long]("yeah"))
+          }.toList
+        }
+        
+        style match {
+          case ListTimelyReport.HOURLY =>
+            query("hour(end)")
+          case ListTimelyReport.DAILY =>
+            query("day_of_year(end)")
+          case ListTimelyReport.MONTHLY =>
+            query("month(end)")
+          case _ =>
+            query("month(end)")
+        }
+    }
   }
 
   /**
@@ -116,7 +151,6 @@ trait PlcRepo {
     }
   }
 
-
   /**
    * Put a setting key/value into the database.
    *
@@ -130,22 +164,18 @@ trait PlcRepo {
   def putSetting(key: String, value: String): Unit = {
     DB.withConnection {
       implicit c =>
-      // H2 does not have a proper merge statement,
-      // so we'll need to check the number of rows
-      // modified instead
+        // H2 does not have a proper merge statement,
+        // so we'll need to check the number of rows
+        // modified instead
         val rowsAltered = SQL(
-          "update plc_setting set value={value} where key={key}"
-        ).on("key" -> key,
-          "value" -> value
-        ).executeUpdate()
+          "update plc_setting set value={value} where key={key}").on("key" -> key,
+            "value" -> value).executeUpdate()
 
         if (rowsAltered <= 0) {
           // Perform the insert
           val rowsAltered = SQL(
-            "insert into plc_setting(key, value) values({key}, {value})"
-          ).on("key" -> key,
-            "value" -> value
-          ).executeInsert()
+            "insert into plc_setting(key, value) values({key}, {value})").on("key" -> key,
+              "value" -> value).executeInsert()
         }
     }
   }

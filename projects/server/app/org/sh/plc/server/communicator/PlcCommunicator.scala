@@ -20,6 +20,11 @@ import org.sh.plc.server.model._
  */
 class PlcCommunicator {
 
+  /**
+   * Delimiter for response values from the PLC server
+   */
+  val delimiter = "|"
+  
   def energyUsage(plcId: Long): EnergyUsage = {
     
     var in: DataInputStream = null
@@ -42,8 +47,16 @@ class PlcCommunicator {
 
       val responseContents = in.readLine()
       
+      val values = responseContents.split(delimiter)
+      
+      if (values) {
+        
+      }
+      
+      val status = values(0)
+      
       // TODO: protocol
-      return new EnergyUsage(0, new Timestamp(0), new Timestamp(0))
+      return new EnergyUsage(plcId, 0, new Timestamp(0), new Timestamp(0))
     }
     catch {
       case e: Exception => {

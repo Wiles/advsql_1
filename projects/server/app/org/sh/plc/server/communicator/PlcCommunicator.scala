@@ -9,10 +9,14 @@
 
 package org.sh.plc.server.communicator
 
-import java.io._
-import java.net._
-import java.sql._
-import org.sh.plc.server.model._
+import java.io.BufferedWriter
+import java.io.DataInputStream
+import java.io.OutputStreamWriter
+import java.net.InetAddress
+import java.net.Socket
+import java.sql.Timestamp
+import org.sh.plc.server.model.EnergyUsage
+import java.util.Date
 
 
 /**
@@ -34,6 +38,7 @@ class PlcCommunicator {
     try {
       val requestContents = "R|%d".format(plcId)
       
+      //TODO: make host and port configurable
       val ia = InetAddress.getByName("localhost")
       socket = new Socket(ia, 9999)
       
@@ -49,14 +54,16 @@ class PlcCommunicator {
       
       val values = responseContents.split(delimiter)
       
-      if (values) {
-        
+      if (values.isEmpty) {
+    	  //TODO: log error
+        throw new Exception();
+      } else if (values(0) == "R" && values.length > 1) {
+    	  // TODO: protocol
+    	  return new EnergyUsage(plcId, values(1).asInstanceOf[Long], new Timestamp(0), new Timestamp(new Date().getTime()))
+      } else {
+        //TODO: log error to db
+        throw new Exception();
       }
-      
-      val status = values(0)
-      
-      // TODO: protocol
-      return new EnergyUsage(plcId, 0, new Timestamp(0), new Timestamp(0))
     }
     catch {
       case e: Exception => {

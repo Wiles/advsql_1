@@ -43,7 +43,7 @@ class PlcServiceSpec extends Specification with Before {
           val start = new GregorianCalendar()
           start.add(Calendar.HOUR, -5)
 
-          val usage = new EnergyUsage(50,
+          val usage = new EnergyUsage(0, 50,
             new Timestamp(start.getTime().getTime()),
             new Timestamp(Calendar.getInstance().getTime().getTime())
           )

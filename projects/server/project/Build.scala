@@ -8,7 +8,8 @@ object ApplicationBuild extends Build {
     val appVersion      = "1.0-SNAPSHOT"
 
     val appDependencies = Seq(
-        "org.quartz-scheduler" % "quartz" % "2.1.6"
+        "org.quartz-scheduler" % "quartz" % "2.1.6",
+        "joda-time" % "joda-time" % "2.1"
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(

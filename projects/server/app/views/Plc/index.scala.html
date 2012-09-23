@@ -1,0 +1,49 @@
+@(
+	plcs: Seq[org.sh.plc.server.model.PlcModel],
+	plcStatuses: Seq[org.sh.plc.server.model.PlcStatusModel],
+	dateFormat: java.text.SimpleDateFormat
+)
+
+@main("Home") {
+
+<span>PLCs</span>
+<table class="plc-table">
+	<thead>
+		<th>PLC #</th>
+		<th>PLC Name</th>
+	</thead>
+	<tbody>
+	@for(p <- plcs) {
+		<tr>
+			<td>@p.id</td>
+			<td>@p.name</td>
+		</tr>
+	}
+	</tbody>
+</table>
+
+<h1></h1>
+<span>Recent PLC Summary</span>
+<table class="plc-table">
+	<thead>
+		<th>Time Polled</th>
+		<th>PLC #</th>
+		<th>PLC Name</th>
+		<th>Status</th>
+		<th>Polled Usage</th>
+		<th>Total Usage</th>
+	</thead>
+	<tbody>
+	@for(p <- plcStatuses) {
+		<tr>
+			<td>@dateFormat.format(p.end)</td>
+			<td>@p.id</td>
+			<td>@p.name</td>
+			<td>@p.status</td>
+			<td>@p.usage</td>
+			<td>@p.total</td>
+		</tr>
+	}
+	</tbody>
+</table>
+}

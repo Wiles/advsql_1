@@ -22,9 +22,9 @@ object JobScheduler {
     val schedules = List(
       PlcWorker.createSchedule())
 
-    schedules.foreach({ (tuple: (JobDetail, SimpleTrigger)) =>
+    schedules.foreach { tuple: (JobDetail, SimpleTrigger) =>
       scheduler.scheduleJob(tuple._1, tuple._2)
-    })
+    }
   }
 
   def onStart(app: Application) {

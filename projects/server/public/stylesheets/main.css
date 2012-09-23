@@ -1,0 +1,40 @@
+body {
+	font-family: 'Segoe UI', Tahoma, Arial, Helvetica, Sans-Serif;
+}
+.nav {
+	
+}
+
+div.nav {
+	border: 1px dashed black;
+}
+
+ul.nav {
+	list-style: none;
+}
+
+li.nav {
+	display: inline;
+	border-left: 1px solid black;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+li.nav a, li.nav a:visited {
+	text-decoration: none;
+	color: black;
+}
+
+li.nav a:hover {
+	color: blue;
+}
+
+
+table.plc-table {
+	border: 1px solid black;
+	width: 75%;
+}
+
+table.plc-table tbody td {
+	text-align: center;
+}

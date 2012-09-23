@@ -48,9 +48,9 @@ object DatabaseSetupConstants {
    * PLC name -> ID
    */
   val plcs = Map(
-    "Plc_1" -> 0,
-    "Plc_2" -> 1,
-    "Plc_3" -> 2
+    "Plc_1" -> 1,
+    "Plc_2" -> 2,
+    "Plc_3" -> 3
   )
 
   /**

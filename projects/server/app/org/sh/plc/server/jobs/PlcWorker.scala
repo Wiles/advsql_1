@@ -70,7 +70,9 @@ class PlcWorker extends Job {
    */
   def execute(context: JobExecutionContext): Unit = {
     val plcs = PlcServices.listPlcs()
-    plcs.map(new PlcCommunicator().energyUsage(_))
+    plcs.map { plc =>
+    	new PlcCommunicator().energyUsage(plc.id)
+	}
 	
   }
 }

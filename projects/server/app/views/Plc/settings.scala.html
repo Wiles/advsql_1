@@ -1,0 +1,32 @@
+@(loginForm: Form[org.sh.plc.server.model.SettingModel])
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@main("Settings") {
+
+    @if(loginForm.hasErrors) {
+        <div class="alert-message error">
+            <p><strong>Oops</strong> Please fix all errors</p>
+        </div>
+    }
+    
+    @helper.form(action = routes.Plc.submitSettings) {
+		<fieldset>
+			<legend>Email - Hourly Threshold Reached</legend>
+			@inputText(
+			    loginForm("email"), 
+			    '_label -> "Email"
+			)
+			
+			@inputText(
+			    loginForm("hourlyEnergyThreshold"), 
+			    '_label -> "Hourly Energy Threshold"
+			)
+        </fieldset>
+        
+        <div class="actions">
+            <input type="submit" class="btn primary" value="Save Changes">
+        </div>
+     }   
+}

@@ -62,14 +62,15 @@ object DatabaseSetup {
             case (key, value) =>
               val count = SQL(countStatement)
                 .on(
-                "id" -> value,
-                "name" -> key
+                "id" -> value
               ).as(scalar[Long].single)
 
               count <= 0
           }.map {
-            case (key, value) =>
-              insertTemplate.format(key, value)
+            case (key, value) => {
+              // SQL injection right here...
+              insertTemplate.format(value, key)
+              }
           }.mkString("")
 
           SQL(ddl).execute()
@@ -77,9 +78,9 @@ object DatabaseSetup {
     }
 
     setup(plcs, "insert into plc(id, name) values(%d, '%s');",
-      "select count(*) as c from plc where id={id} and name={name}")
+      "select count(*) as c from plc where id={id}")
 
     setup(statuses, "insert into plc_status(id, name) values(%d, '%s');",
-      "select count(*) as c from plc_status where id={id} and name={name}")
+      "select count(*) as c from plc_status where id={id}")
   }
 }

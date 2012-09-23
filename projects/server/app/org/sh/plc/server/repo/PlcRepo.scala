@@ -8,7 +8,10 @@
  */
 package org.sh.plc.server.repo
 
-import java.sql.{ Timestamp }
+import java.sql.Timestamp
+import java.util.Date
+import java.math.BigDecimal
+
 import anorm._
 import anorm.SqlParser._
 
@@ -54,15 +57,50 @@ trait PlcRepo {
   }
 
   /**
-   * List all plc ids in the database
+   * List all plcs in the database
    * @return
    * plc ids
    */
-  def listPlcs(): Array[Long] = {
+  def listPlcs(): Array[PlcModel] = {
     DB.withConnection {
       implicit c =>
-        SQL("select id from plc")().map(_[Long]("id")).toArray
+        SQL("select id, name  from plc")().map { row =>
+        	new PlcModel(row[Long]("id"), row[String]("name"))
+        }.toArray
     }
+  }
+  
+  def listPlcStatuses(): Array[PlcStatusModel] = {
+  	DB.withConnection {
+  		implicit c =>
+  			SQL("""
+  				select 
+  					plc.id as id, 
+  					plc.name as name,
+  					ps.name as status,
+  					pe.start as start,
+  					pe.end as end,
+  					pe.usage as usage,
+  					ptotal.total as total
+  				from plc
+  					left join (select plc, status, usage, start, end, max(end) 
+  									from plc_event group by plc, status, usage, start, end) pe
+  						on pe.plc=plc.id
+  					inner join plc_status ps on ps.id=pe.status
+  					left join (select plc, sum(usage) as total from plc_event group by plc) ptotal 
+  						on  ptotal.plc = plc.id
+  			""")().map { row =>
+  				new PlcStatusModel(
+  					row[Long]("id"),
+  					row[String]("name"),
+  					row[String]("status"),
+  					row[Date]("start"),
+  					row[Date]("end"),
+  					row[Long]("usage"),
+  					row[BigDecimal]("total")
+  				)
+  			}.toArray
+  	}
   }
 
   /**

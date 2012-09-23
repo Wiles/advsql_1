@@ -38,20 +38,20 @@ class PlcServiceSpec extends Specification with Before {
       }
     }
 
-      "logged" in {
-        running(FakeApplication()) {
-          val start = new GregorianCalendar()
-          start.add(Calendar.HOUR, -5)
+    "logged" in {
+      running(FakeApplication()) {
+        val start = new GregorianCalendar()
+        start.add(Calendar.HOUR, -5)
 
-          val usage = new EnergyUsage(0, 50,
-            new Timestamp(start.getTime().getTime()),
-            new Timestamp(Calendar.getInstance().getTime().getTime())
-          )
+        val usage = new EnergyUsage(0, 50,
+          new Timestamp(start.getTime().getTime()),
+          new Timestamp(Calendar.getInstance().getTime().getTime())
+        )
 
-          PlcServices.logEnergyUsage(0, usage)
+        PlcServices.logEnergyUsage(0, usage)
 
-          true
-        }
+        true
       }
     }
+  }
 }

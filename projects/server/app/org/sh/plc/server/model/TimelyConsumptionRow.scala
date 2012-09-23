@@ -6,7 +6,7 @@
  * DESCRIPTION:
  *
  */
-package org.sh.plc.server.repo
+package org.sh.plc.server.model
 
 /**
  * @param plc

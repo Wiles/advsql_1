@@ -18,6 +18,14 @@ import org.sh.plc.server.model._
 import org.sh.plc.server.jobs.DatabaseSetupConstants
 
 /**
+ * An enumeration for grouping styles of the timely report
+ */
+object ListTimelyReport extends Enumeration {
+  type ListTimelyReport = Value
+  val HOURLY, DAILY, WEEKLY = Value
+}
+
+/**
  * Repository containing functions that deal on the plc event table
  */
 trait PlcRepo {
@@ -57,12 +65,34 @@ trait PlcRepo {
     }
   }
 
-  def findConsumptionByPlc(plcId: Int, start: Timestamp, end: Timestamp): Double = {
+  /**
+   * List the total consumption for every PLC
+   * device
+   * @return
+   */
+  def listTotalConsumption(start: Timestamp, end: Timestamp): List[EnergyUsage] = {
     DB.withConnection {
       implicit c =>
-        SQL("select * from plc_event where plc={plcId} and ")
+        val rows = SQL(
+          """select sum(usage), plc from plc_event
+            where start <= {start} and end <= {end}
+          group by plc""")
+          .execute()
+
+        rows
+          .map(new EnergyUsage(_[Long]("usage"), _[Long]("plc"), start, end))
+          .toList()
     }
-    0.0
+  }
+
+  /**
+   *
+   * @param start
+   * @param end
+   */
+  def listTimelyConsumption(style: ListTimelyReport.ListTimelyReport,
+                            start: Timestamp, end: Timestamp): Unit = {
+
   }
 
   /**

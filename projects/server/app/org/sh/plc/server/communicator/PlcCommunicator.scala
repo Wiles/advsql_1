@@ -11,17 +11,12 @@ package org.sh.plc.server.communicator
 
 import play.api._
 import play.api.Play._
-
-import java.io.BufferedWriter
-import java.io.DataInputStream
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import java.net.InetAddress
-import java.net.Socket
+import java.io._
+import java.net._
 import java.sql.Timestamp
-import org.sh.plc.server.model.EnergyUsage
 import java.util.Date
-import java.io.BufferedReader
+
+import org.sh.plc.server.model.EnergyUsage
 
 /**
  * Provide an interface to communicate with a Plc
@@ -52,7 +47,7 @@ class PlcCommunicator {
     try {
       val configuration = Play.application.configuration
 
-      val hostname = configuration.getString("oplc_server_address").getOrElse({
+      val address = configuration.getString("oplc_server_address").getOrElse({
     	  // TODO: Fix continual warning that will annoy users/admins...
         Logger.warn("Failure to find oplc_server_address configured in Play Application. Using %s".format(DefaultHost))
         "localhost"
@@ -64,10 +59,8 @@ class PlcCommunicator {
         DefaultPort
       })
 
-      val address = InetAddress.getByName(hostname)
-      socket = new Socket(address, port)
-      
-      socket.setSoTimeout(DefaultTimeout)
+      socket = new Socket()
+      socket.connect(new InetSocketAddress(address, port), DefaultTimeout)
 
       in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
       out = new BufferedWriter(

@@ -8,6 +8,8 @@
  */
 package org.sh.plc.server.jobs
 
+import play.api._
+
 import org.quartz.JobBuilder.newJob
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
@@ -23,7 +25,7 @@ object PlcWorker {
   /**
    * Run interval in seconds 
    */
-  private val intervalInSeconds = 8000
+  private val intervalInSeconds = 10
 
   /**
    * Job id

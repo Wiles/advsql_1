@@ -29,19 +29,21 @@ object JobScheduler {
 
   def onStart(app: Application) {
     Logger.info("Quartz scheduler starting...")
+    Logger.info("Registering Jobs...")
+    registerSchedules()
 
     /*
      * Start the Quartz Scheduler
      */
-    val thread = new Thread() {
+    val thread = new Thread(
       new Runnable() {
         def run(): Unit = {
+          Logger.info("Starting Jobs...")
           scheduler.start()
-          registerSchedules()
         }
       }
-    }
-    
+    )
+
     thread.start()
 
   }

@@ -8,9 +8,14 @@
  */
 package org.sh.plc.conf
 
-import java.io._
-import java.net._
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.IOException
+import java.net.URLDecoder
 import java.util.Properties
+
+import scala.Array.canBuildFrom
 import scala.collection.mutable.LinkedHashMap
 
 /**
@@ -44,7 +49,6 @@ private class ConfigurationReader(val file: File) extends ConfigurationValues {
     val props = parse(file)
     
     c.verbose = props.getProperty("verbose", verbose.toString).equalsIgnoreCase("true")
-    
     try {
     	c.port = props.getProperty("port", port.toString).toInt
     } catch {
@@ -62,6 +66,7 @@ private class ConfigurationReader(val file: File) extends ConfigurationValues {
         Logger.log(e, "[Configuration] Failure to parse rates")
       }
     }
+    Logger.log("[Configuration] %d plcs running at tick rates %s".format(c.rates.length, c.rates.mkString(" ")))
   }
 
   /**

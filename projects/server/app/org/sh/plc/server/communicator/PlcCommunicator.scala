@@ -11,12 +11,14 @@ package org.sh.plc.server.communicator
 
 import java.io.BufferedWriter
 import java.io.DataInputStream
+import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.InetAddress
 import java.net.Socket
 import java.sql.Timestamp
 import org.sh.plc.server.model.EnergyUsage
 import java.util.Date
+import java.io.BufferedReader
 
 
 /**
@@ -31,7 +33,7 @@ class PlcCommunicator {
   
   def energyUsage(plcId: Long): EnergyUsage = {
     
-    var in: DataInputStream = null
+    var in: BufferedReader = null
     var out: BufferedWriter = null
     var socket: Socket = null
     
@@ -39,13 +41,11 @@ class PlcCommunicator {
       val requestContents = "R|%d".format(plcId)
       
       //TODO: make host and port configurable
-      val ia = InetAddress.getByName("localhost")
-      socket = new Socket(ia, 9999)
-      
-      in = new DataInputStream(socket.getInputStream())
+      val ia = InetAddress.getByName("192.168.1.107")
+      socket = new Socket(ia, 9015)
+      in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
       out = new BufferedWriter(
         new OutputStreamWriter(socket.getOutputStream()))
-      
 
       out.write(requestContents)
       out.flush()

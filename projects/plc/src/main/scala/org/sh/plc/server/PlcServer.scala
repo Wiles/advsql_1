@@ -10,26 +10,31 @@
 
 package org.sh.plc.server
 
-import java.io._
-import java.net._
-import java.util._
-import org.sh.plc._
-import org.sh.plc.conf._
-import org.sh.plc.manager._
-import org.sh.plc.emulator._
+import java.io.BufferedReader
+import java.io.DataOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.ServerSocket
+import java.net.Socket
+import java.net.SocketException
+
+import org.sh.plc.conf.Configuration
+import org.sh.plc.conf.Logger
 
 /**
- * 
+ * Handles Socket communication to the
+ * outside world
  */
 object PlcServer {
   /**
-   * 
+   * Starts the server listening on the configured port.
+   * Creates a new thread for each incoming connection
    */
   def start(socketProcessor: SocketProcessor): Unit = {
     try {
       val port = Configuration.port
       
-      Logger.log("Using port: %s".format(port))
+      Logger.log("[Configuration] Using port: %s".format(port))
       
       val listener = new ServerSocket(port)
       while (true) {
@@ -59,8 +64,10 @@ class ServerThread(val socket: Socket,
         new InputStreamReader(socket.getInputStream()))
 
       val request = new SocketRequest(in.readLine())
+      Logger.log("[Server] Request: %s".format(request.content))
       val response = socketProcessor.request(request)
       
+      Logger.log("[Server] Response: %s".format(response.content))
       out.write(response.content.getBytes())
       
       out.close()

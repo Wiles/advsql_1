@@ -7,7 +7,17 @@
  */
 package org.sh.plc.server.jobs
 
-import play.api._
+import scala.Array.canBuildFrom
+import scala.annotation.implicitNotFound
+
+import org.sh.plc.server.communicator.PlcCommunicator
+import org.sh.plc.server.services.PlcServices
+
+import akka.util.duration.intToDurationInt
+import play.api.Application
+import play.api.GlobalSettings
+import play.api.Play.current
+import play.api.libs.concurrent.Akka
 
 
 /**
@@ -23,6 +33,13 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     JobScheduler.onStart(app)
+    /*
+    var worker = new PlcWorker()
+    Akka.system.scheduler.schedule(0 seconds, 60 seconds)({
+    	val plcs = PlcServices.listPlcs()
+        plcs.map(new PlcCommunicator().energyUsage(_))
+    })
+    */
     DatabaseSetup.onStart(app)
   }
   
@@ -30,3 +47,4 @@ object Global extends GlobalSettings {
     JobScheduler.onStop(app)
   }
 }
+

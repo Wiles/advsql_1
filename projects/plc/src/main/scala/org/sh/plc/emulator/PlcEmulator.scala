@@ -12,8 +12,9 @@ package org.sh.plc.emulator
 import java.util.Date
 
 /**
+ * Represents a single PLC device
  *
- * @param tickRate
+ * @param tickRate the number of ticks the simulated PLC generates per-seconds
  */
 class PlcEmulator(val tickRate: Double) {
   require(tickRate > 0)

@@ -9,8 +9,9 @@
 
 package org.sh.plc.server
 
-import org.sh.plc.manager._
-import scala.util._
+import scala.util.Random
+
+import org.sh.plc.manager.PlcManagerComponent
 
 /**
  * Response to send back to a client connection

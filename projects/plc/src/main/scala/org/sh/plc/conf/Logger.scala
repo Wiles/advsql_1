@@ -15,10 +15,17 @@ package org.sh.plc.conf
  * Crappy logger.
  */
 object Logger {
+  
+  /**
+   * Write a custom message to the log
+   */
   def log(message: String): Unit = {
     println(message)
   }
 
+  /**
+   * Write an Exception to the log
+   */
   def log(e: Exception): Unit = {
     println(e.getMessage())
     if (Configuration.verbose) {
@@ -26,6 +33,9 @@ object Logger {
     }
   }
   
+  /**
+   * Write and Exception and a custom message to the log
+   */
   def log(e: Exception, message: String): Unit = {
     log(message)
     log(e)

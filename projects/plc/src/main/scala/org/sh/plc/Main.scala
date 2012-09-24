@@ -9,7 +9,8 @@
 
 package org.sh.plc
 
-import org.sh.plc.server._
+import org.sh.plc.server.PlcServer
+import org.sh.plc.server.SocketProcessorComponent
 
 object Main extends SocketProcessorComponent {
   def main(args: Array[String]): Unit = {

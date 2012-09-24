@@ -12,24 +12,22 @@ package org.sh.plc.server
 
 import java.io._
 import java.net._
-import java.util._
-import org.sh.plc._
 import org.sh.plc.conf._
-import org.sh.plc.manager._
-import org.sh.plc.emulator._
 
 /**
- * 
+ * Handles Socket communication to the
+ * outside world
  */
 object PlcServer {
   /**
-   * 
+   * Starts the server listening on the configured port.
+   * Creates a new thread for each incoming connection
    */
   def start(socketProcessor: SocketProcessor): Unit = {
     try {
       val port = Configuration.port
       
-      Logger.log("Using port: %s".format(port))
+      Logger.log("[Configuration] Using port: %s".format(port))
       
       val listener = new ServerSocket(port)
       while (true) {
@@ -54,14 +52,17 @@ class ServerThread(val socket: Socket,
 
   override def run(): Unit = {
     try {
-      val out = new DataOutputStream(socket.getOutputStream())
+      val out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))
       val in = new BufferedReader(
         new InputStreamReader(socket.getInputStream()))
 
       val request = new SocketRequest(in.readLine())
+      Logger.log("[Server] Request: %s".format(request.content))
       val response = socketProcessor.request(request)
       
-      out.write(response.content.getBytes())
+      Logger.log("[Server] Response: %s".format(response.content))
+      out.write(response.content)
+      out.flush()
       
       out.close()
       in.close()
@@ -71,9 +72,7 @@ class ServerThread(val socket: Socket,
         Logger.log(e)
         () // avoid stack trace when stopping a client with Ctrl-C
       }
-      case e: IOException => {
-        e.printStackTrace()
-      }
+      case e: Exception => Logger.log(e)
     }
   }
 

@@ -65,15 +65,15 @@ trait PlcRepo {
     DB.withConnection {
       implicit c =>
         SQL("select id, name  from plc")().map { row =>
-        	new PlcModel(row[Long]("id"), row[String]("name"))
+          new PlcModel(row[Long]("id"), row[String]("name"))
         }.toArray
     }
   }
-  
+
   def listPlcStatuses(): Array[PlcStatusModel] = {
-  	DB.withConnection {
-  		implicit c =>
-  			SQL("""
+    DB.withConnection {
+      implicit c =>
+        SQL("""
   				select 
   					plc.id as id, 
   					plc.name as name,
@@ -90,17 +90,17 @@ trait PlcRepo {
   					left join (select plc, sum(usage) as total from plc_event group by plc) ptotal 
   						on  ptotal.plc = plc.id
   			""")().map { row =>
-  				new PlcStatusModel(
-  					row[Long]("id"),
-  					row[String]("name"),
-  					row[String]("status"),
-  					row[Date]("start"),
-  					row[Date]("end"),
-  					row[Long]("usage"),
-  					row[BigDecimal]("total")
-  				)
-  			}.toArray
-  	}
+          new PlcStatusModel(
+            row[Long]("id"),
+            row[String]("name"),
+            row[String]("status"),
+            row[Date]("start"),
+            row[Date]("end"),
+            row[Long]("usage"),
+            row[BigDecimal]("total")
+          )
+        }.toArray
+    }
   }
 
   /**
@@ -128,7 +128,7 @@ trait PlcRepo {
    * @param end
    */
   def listTimelyConsumption(style: ListTimelyReport.ListTimelyReport,
-    start: Timestamp, end: Timestamp): Unit = {
+                            start: Timestamp, end: Timestamp): Unit = {
     DB.withConnection {
       implicit c =>
         def query(group: String) = {
@@ -154,7 +154,7 @@ trait PlcRepo {
               row[Long]("yeah"))
           }.toList
         }
-        
+
         style match {
           case ListTimelyReport.HOURLY =>
             query("hour(end)")
@@ -165,6 +165,28 @@ trait PlcRepo {
           case _ =>
             query("month(end)")
         }
+    }
+  }
+
+  /**
+   * @return
+   * sum of usage in last hour of PLC's usage events
+   */
+  def getConsumptionInLastHour(plcId: Long): Long = {
+    DB.withConnection {
+      implicit c =>
+        SQL("""
+      	    select
+      			sum(pe.usage) as total
+      	    from plc_event pe
+        		inner join plc on plc.id=pe.plc
+      	    where
+	      			end >= dateadd(hour, -1, current_timestamp())
+	  			and
+	      			plc.id = {plcId}
+     	""")
+     	.on("plcId" -> plcId)
+        .as(scalar[Long].single)
     }
   }
 

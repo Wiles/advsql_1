@@ -1,3 +1,27 @@
+@(reportForm: Form[org.sh.plc.server.model.TotalConsumptionModel])
+
+@import helper._
+@import helper.twitterBootstrap._
+
 @main("Total Consumption Report") {
+
+    @if(loginForm.hasErrors) {
+        <div class="alert-message error">
+            <p><strong>Oops</strong> Please fix all errors</p>
+        </div>
+    }
     
+    @helper.form(action = routes.Plc.submitTotalConsumption) {
+		<fieldset>
+			<legend>Email - Hourly Threshold Reached</legend>
+			@inputText(
+			    loginForm("email"), 
+			    '_label -> "Email"
+			)
+        </fieldset>
+        
+        <div class="actions">
+            <input type="submit" class="btn primary" value="Generate">
+        </div>
+     }
 }

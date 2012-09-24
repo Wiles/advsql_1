@@ -28,7 +28,7 @@ class PlcCommunicator {
    */
   val Delimiter = "|"
 
-  val DefaultHost = "localhost"
+  val DefaultHost = "127.0.0.1"
   val DefaultPort = 9999
   val DefaultTimeout = 30000 // milliseconds
 
@@ -78,6 +78,7 @@ class PlcCommunicator {
 
       val values = responseContents.split(Delimiter)
       Logger.debug(values.mkString)
+      
       if (values.isEmpty) {
         throw new Exception("Failure to read values from response for PLC #: %d".format(plcId));
       } else if (values.length > 2 && values(0) == "R") {

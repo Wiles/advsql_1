@@ -10,6 +10,8 @@ import org.sh.plc.server.model._
 import org.sh.plc.server.services._
 import scala.util.control.Exception._
 import java.sql.Timestamp
+import org.sh.plc.server.repo.ListTimelyReport
+import java.util.LinkedHashMap
 
 object Plc extends Controller {
 
@@ -37,19 +39,35 @@ object Plc extends Controller {
   /**
    * Total Consumption report
    */
-  def totalConsumption(start: String, end: String) = Action {
+  def totalConsumption(start: String, end: String, report: Int) = Action {
 
-    def process(): Tuple2[Seq[EnergyUsage], String]  = {
+    def process(): Tuple2[List[LinkedHashMap[String, Any]], String]  = {
 	    try {
-	      val startDate = TotalConsumptionModel.Default.dateFormatter.parse(start)
-	      val endDate = TotalConsumptionModel.Default.dateFormatter.parse(end)
+	      val formatter = TotalConsumptionModel.Default.dateFormatter
+	      val startDate = formatter.parse(start)
+	      val endDate = formatter.parse(end)
 	
-	      val items = PlcServices.listTotalConsumption(new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()))
+	      val types = Array(
+	          ListTimelyReport.DAILY,
+	          ListTimelyReport.HOURLY,
+	          ListTimelyReport.MONTHLY,
+	          ListTimelyReport.TOTAL
+	      )
+	      
+	      var reportType = ListTimelyReport.TOTAL
+	      val validReport = report >= 0 && report < types.length
+	      if (validReport) {
+	        reportType = types(report)
+	      }
+	      
+	      val items = PlcServices.listTimelyConsumption(reportType,
+	          new Timestamp(startDate.getTime()), new Timestamp(endDate.getTime()))
 	      
 	      (items, "")
 	    } catch {
 	      case e: Exception =>
-	        (List[EnergyUsage](), "Please select a start and end date")
+	        e.printStackTrace()
+	        (List[LinkedHashMap[String, Any]](), "Please select a start and end date")
 	    }
     }
 
@@ -57,10 +75,8 @@ object Plc extends Controller {
     val items = tuple._1
     val errors = tuple._2
 
-    Ok(html.Plc.totalConsumption(start, end, errors))
+    Ok(html.Plc.totalConsumption(start, end, report, items, errors))
   }
-
-  def intervalConsumptionReport(start: String, end: String, interval: Int) = TODO
 
   /**
    * Settings form

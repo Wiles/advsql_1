@@ -9,14 +9,16 @@
 
 package org.sh.plc.server.communicator
 
+import scala.util.control.Exception._
 import play.api._
 import play.api.Play._
 import java.io._
 import java.net._
 import java.sql.Timestamp
 import java.util.Date
-
 import org.sh.plc.server.model.EnergyUsage
+import org.sh.plc.server.services.PlcServices
+import java.util.Calendar
 
 /**
  * Provide an interface to communicate with a Plc
@@ -26,7 +28,7 @@ class PlcCommunicator {
   /**
    * Delimiter for response values from the PLC server
    */
-  val Delimiter = "|"
+  val Delimiter = "\\|"
 
   val DefaultHost = "127.0.0.1"
   val DefaultPort = 9999
@@ -35,10 +37,10 @@ class PlcCommunicator {
   /**
    * Get the energy usage for a PLC
    */
-  def energyUsage(plcId: Long): EnergyUsage = {
+  def energyUsage(plcId: Long): Unit = {
 
     Logger.debug("Bob")
-    
+
     // Stupid Scala library doesn't have 'using' statement...
     var in: BufferedReader = null
     var out: BufferedWriter = null
@@ -48,13 +50,13 @@ class PlcCommunicator {
       val configuration = Play.application.configuration
 
       val address = configuration.getString("oplc_server_address").getOrElse({
-    	  // TODO: Fix continual warning that will annoy users/admins...
+        // TODO: Fix continual warning that will annoy users/admins...
         Logger.warn("Failure to find oplc_server_address configured in Play Application. Using %s".format(DefaultHost))
         "localhost"
       })
 
       val port = configuration.getInt("oplc_server_port").getOrElse({
-    	  // TODO: Fix continual warning that will annoy users/admins...
+        // TODO: Fix continual warning that will annoy users/admins...
         Logger.warn("Failure to find oplc_server_port configured in Play Application. Using %d".format(DefaultPort))
         DefaultPort
       })
@@ -66,38 +68,40 @@ class PlcCommunicator {
       out = new BufferedWriter(
         new OutputStreamWriter(socket.getOutputStream()))
 
-      Logger.debug("a")
       val requestContents = "R|%d\r\n".format(plcId)
       out.write(requestContents)
-      Logger.debug("b")
       out.flush()
-      
-      Logger.debug("c")
+
       val responseContents = in.readLine()
-      Logger.debug("d")
 
       val values = responseContents.split(Delimiter)
-      Logger.debug(values.mkString)
+
+      val currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime())
       
       if (values.isEmpty) {
-        throw new Exception("Failure to read values from response for PLC #: %d".format(plcId));
+        throw new Exception("Failure to read values from response for PLC #%d".format(plcId));
       } else if (values.length > 2 && values(0) == "R") {
-    	  val responsePlcId = values(1).toInt
+        val responsePlcId = values(1).toInt
         val usage = values(2).toInt
-        // TODO: store previous time...
-        Logger.debug("PLC #%d usage: %d".format(plcId))
-        return new EnergyUsage(plcId, values(1).asInstanceOf[Long], new Timestamp(0), new Timestamp(new Date().getTime()))
+
+        Logger.debug("PLC #%d usage: %d".format(plcId, usage))
+        
+        val energyUsage = new EnergyUsage(plcId, usage, currentTimestamp)
+        
+        PlcServices.logEnergyUsage(energyUsage)
       } else {
-        //TODO: log error to db?
-        throw new Exception();
+        PlcServices.logFailureEvent(plcId, currentTimestamp)
       }
+      
     } finally {
       if (out != null) {
         out.close()
       }
+      
       if (in != null) {
         in.close()
       }
+      
       if (socket != null) {
         socket.close()
       }

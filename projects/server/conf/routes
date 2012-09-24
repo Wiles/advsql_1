@@ -2,11 +2,10 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET     /                           					controllers.Plc.index
-GET     /report/totalConsumption		controllers.Plc.totalConsumption(start: String, end: String)
-GET     /report/intervalConsumption	controllers.Plc.intervalConsumptionReport(start: String, end: String, interval: Int)
-GET     /plc/settings                           	controllers.Plc.settings
-GET     /plc/settings/submit					controllers.Plc.submitSettings
+GET     /                           	controllers.Plc.index
+GET     /report/totalConsumption		controllers.Plc.totalConsumption(start: String, end: String, report: Int)
+GET     /plc/settings                   controllers.Plc.settings
+GET     /plc/settings/submit			controllers.Plc.submitSettings
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

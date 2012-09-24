@@ -36,7 +36,7 @@
 	<tbody>
 	@for(p <- plcStatuses) {
 		<tr>
-			<td>@dateFormat.format(p.end)</td>
+			<td>@p.end</td>
 			<td>@p.id</td>
 			<td>@p.name</td>
 			<td>@p.status</td>

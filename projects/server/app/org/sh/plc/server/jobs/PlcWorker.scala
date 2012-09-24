@@ -71,10 +71,15 @@ class PlcWorker extends Job {
    * @param context Quartz context
    */
   def execute(context: JobExecutionContext): Unit = {
-    val plcs = PlcServices.listPlcs()
-    plcs.map { plc =>
-    	new PlcCommunicator().energyUsage(plc.id)
-	}
+    try {
+	    val plcs = PlcServices.listPlcs()
+	    plcs.map { plc =>
+	    	new PlcCommunicator().energyUsage(plc.id)
+		}
+    } catch {
+      case e: Exception =>
+      	e.printStackTrace()
+    }
 	
   }
 }

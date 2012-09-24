@@ -1,11 +1,14 @@
-@(start: String, end: String, errors: String)
+@(start: String, 
+	end: String, 
+	report: Int, 
+	items: List[java.util.LinkedHashMap[String, Any]], 
+	errors: String)
 
-@main("Total Consumption Report") {
+@main("Consumption Reports") {
 
     @if(!errors.isEmpty()) {
         <div class="alert-message error">
-            <p><strong>Oops</strong>Please fix all errors</p>
-            <p>@errors</p>
+            <p style="color: red">@errors</p>
         </div>
     }
     
@@ -21,6 +24,21 @@
 					<td><span>Before</span></td>
 					<td><input type="text" name="end" value="@end" /></td>
 				</tr>
+				<tr>
+					<td>Report</td>
+					<td>
+						<select name="report">
+							<option value="1" 
+								@if( report == 1 ) {selected="selected"})>Hourly</option>
+							<option value="0"
+								@if( report == 0 ) {selected="selected"})>Daily</option>
+							<option value="2"
+								@if( report == 2 ) {selected="selected"})>Monthly</option>
+							<option value="3"
+								@if( report == 3 ) {selected="selected"})>Total</option>
+						</select>
+					</td>
+				</tr>
 			</table>
         </fieldset>
         
@@ -28,4 +46,26 @@
             <input type="submit" class="btn primary" value="Generate">
         </div>
     </form>
+    
+   	@if(items.size > 0) {
+   	<h3>Report Data</h3>
+    <table class="plc-table">
+    	<thead>
+    		@for(i <- items(0).keySet) {
+    			<th>@i</th>
+    		}
+    	</thead>
+    	<tbody>
+    		@for(i <- items) {
+	    		<tr>
+	    			@for(v <- i.values) {
+		    			<td>@v</t>
+		    		}
+	    		</tr>
+    		}
+    	</tbody>
+    </table>
+    } else {
+    	<span>No data to report</span>
+    }
 }

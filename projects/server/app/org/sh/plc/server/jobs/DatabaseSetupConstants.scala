@@ -32,9 +32,8 @@ object DatabaseSetupConstants {
 	  id long primary key auto_increment,
 	  plc long references plc(id),
 	  status long references plc_status(id),
-    usage long not null,
-	  start date not null,
-	  end date not null
+      usage long not null,
+	  end timestamp not null
       	""",
 
     "plc_setting" ->

@@ -8,7 +8,7 @@ object TotalConsumptionModel {
     val end = "end"
   }
   object Default {
-    val dateFormat = "dd/MM/yyyy kk:mm"
+    val dateFormat = "dd/MM/yyyy KK:mm"
     val dateFormatter = new SimpleDateFormat(dateFormat)
   }
 }

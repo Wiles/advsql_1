@@ -21,5 +21,4 @@ import java.sql._
  * @param end
  * 	time at which energy usage tracking ended
  */
-class EnergyUsage(val plc: Long, val usage: Long, 
-    val start: Timestamp, val end: Timestamp)
+class EnergyUsage(val plc: Long, val usage: Long, val end: Timestamp)

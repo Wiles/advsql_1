@@ -15,8 +15,7 @@ case class PlcStatusModel(
 	id: Long, 
 	name: String, 
 	status: String, 
-	start: Date, 
-	end: Date, 
+	end: String, 
 	usage: Long, 
 	total: BigDecimal
 )

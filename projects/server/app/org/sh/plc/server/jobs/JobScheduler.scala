@@ -10,18 +10,20 @@ package org.sh.plc.server.jobs
 import org.quartz._
 import org.quartz.impl._
 import play.api._
+import scala.collection.mutable.MutableList
 
 /**
  * Register jobs for scheduling
  */
 object JobScheduler {
-  val scheduler = StdSchedulerFactory.getDefaultScheduler()
+  var scheduler: Scheduler = _
+  // TODO: Threadpool
+  val threads = new MutableList[Thread]
 
   def registerSchedules(): Unit = {
-
     val schedules = List(
       PlcWorker.createSchedule())
-
+      
     schedules.foreach { tuple: (JobDetail, SimpleTrigger) =>
       scheduler.scheduleJob(tuple._1, tuple._2)
     }
@@ -30,6 +32,9 @@ object JobScheduler {
   def onStart(app: Application) {
     Logger.info("Quartz scheduler starting...")
     Logger.info("Registering Jobs...")
+    
+    scheduler = StdSchedulerFactory.getDefaultScheduler()
+    
     registerSchedules()
 
     /*
@@ -45,12 +50,19 @@ object JobScheduler {
     )
 
     thread.start()
-
+    threads += thread
   }
 
   def onStop(app: Application) {
     Logger.info("Quartz scheduler shutdown.")
+    
     scheduler.shutdown()
+    
+    for(thread <- threads) {
+      if (thread.isAlive()) {
+    	  thread.join()
+      }
+    }
   }
 
 }

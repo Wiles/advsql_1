@@ -11,21 +11,20 @@ package org.sh.plc.server.repo
 import java.sql.Timestamp
 import java.util.Date
 import java.math.BigDecimal
-
 import anorm._
 import anorm.SqlParser._
-
 import play.api.Play._
 import play.api.db._
 import org.sh.plc.server.model._
 import org.sh.plc.server.jobs.DatabaseSetupConstants
+import java.util.LinkedHashMap
 
 /**
  * An enumeration for grouping styles of the timely report
  */
 object ListTimelyReport extends Enumeration {
   type ListTimelyReport = Value
-  val HOURLY, DAILY, MONTHLY = Value
+  val TOTAL, HOURLY, DAILY, MONTHLY = Value
 }
 
 /**
@@ -41,17 +40,31 @@ trait PlcRepo {
    * @param usage
    * amount of energy used and timestamps
    */
-  def logEnergyUsage(plc: Int, usage: EnergyUsage): Unit = {
+  def logEnergyUsage(usage: EnergyUsage): Unit = {
     DB.withConnection {
       implicit c =>
         SQL("""
-               insert into plc_event(plc, status, usage, start, end)
-               values({plc}, {status}, {usage}, {start}, {end})""")
-          .on("plc" -> plc)
-          .on("status" -> DatabaseSetupConstants.statuses("Failure"))
+               insert into plc_event(plc, status, usage, end)
+               values({plc}, {status}, {usage}, CURRENT_TIMESTAMP())""")
+          .on("plc" -> usage.plc)
+          .on("status" -> DatabaseSetupConstants.statuses("Valid"))
           .on("usage" -> usage.usage)
-          .on("start" -> usage.start)
-          .on("end" -> usage.end)
+          .executeInsert()
+    }
+  }
+  
+  /**
+   * Log a failure event
+   */
+  def logFailureEvent(plcId: Long, end: Timestamp): Unit = {
+    DB.withConnection {
+      implicit c =>
+        SQL("""
+               insert into plc_event(plc, status, usage, end)
+               values({plc}, {status}, {usage}, CURRENT_TIMESTAMP())""")
+          .on("plc" -> plcId)
+          .on("status" -> DatabaseSetupConstants.statuses("Failure"))
+          .on("usage" -> 0)
           .executeInsert()
     }
   }
@@ -70,55 +83,43 @@ trait PlcRepo {
     }
   }
 
+  /**
+   * List statuses
+   */
   def listPlcStatuses(): Array[PlcStatusModel] = {
     DB.withConnection {
       implicit c =>
         SQL("""
   				select 
+        			max(pe.end) as max_end,
   					plc.id as id, 
   					plc.name as name,
   					ps.name as status,
-  					pe.start as start,
-  					pe.end as end,
+        			FORMATDATETIME(pe.end, 'd/MM/yyyy HH:mm') as end,
   					pe.usage as usage,
   					ptotal.total as total
   				from plc
-  					left join (select plc, status, usage, start, end, max(end) 
-  									from plc_event group by plc, status, usage, start, end) pe
-  						on pe.plc=plc.id
+  					inner join plc_event pe on pe.plc=plc.id
   					inner join plc_status ps on ps.id=pe.status
   					left join (select plc, sum(usage) as total from plc_event group by plc) ptotal 
   						on  ptotal.plc = plc.id
+        		group by
+        			plc.id,
+        			plc.name,
+        			ps.name,
+        			pe.usage, 
+        			pe.end,
+        			ptotal.total
+        		limit 50
   			""")().map { row =>
           new PlcStatusModel(
             row[Long]("id"),
             row[String]("name"),
             row[String]("status"),
-            row[Date]("start"),
-            row[Date]("end"),
+            row[String]("end"),
             row[Long]("usage"),
-            row[BigDecimal]("total")
-          )
+            row[BigDecimal]("total"))
         }.toArray
-    }
-  }
-
-  /**
-   * List the total consumption for every PLC
-   * device
-   * @return
-   */
-  def listTotalConsumption(start: Timestamp, end: Timestamp): List[EnergyUsage] = {
-    DB.withConnection {
-      implicit c =>
-        val rows = SQL(
-          """select sum(usage), plc from plc_event
-            where start <= {start} and end <= {end}
-          group by plc""")()
-
-        rows.map { row =>
-          new EnergyUsage(row[Long]("plc"), row[Long]("usage"), start, end)
-        }.toList
     }
   }
 
@@ -128,42 +129,166 @@ trait PlcRepo {
    * @param end
    */
   def listTimelyConsumption(style: ListTimelyReport.ListTimelyReport,
-                            start: Timestamp, end: Timestamp): Unit = {
+    start: Timestamp, end: Timestamp): List[LinkedHashMap[String, Any]] = {
     DB.withConnection {
       implicit c =>
-        def query(group: String) = {
+        def total() = {
+          val rows = SQL(
+            """
+              select 
+        		  sum(usage) as usage_sum,
+        		  plc.id as plc_id,
+        		  plc.name as plc_name
+              from plc_event
+              inner join plc on plc.id=plc_event.plc
+    		  where 
+        		  end >= {start}
+              and
+        		  end <= {end}
+    		  group by 
+        		  plc.id, plc.name""")
+    	.on("start" -> start, "end" -> end)()
+
+          rows.map { row =>
+            val map = new LinkedHashMap[String, Any]()
+            map.put("PLC #", row[Long]("plc_id"))
+            map.put("PLC Name", row[String]("plc_name"))
+            map.put("Total Usage", row[BigDecimal]("usage_sum").longValue)
+            map
+          }.toList
+        }
+
+        def hourly() = {
           val rows = SQL(
             """select 
         		sum(usage) as usage_sum,
-        		plc,
+        		plc.id as plc_id,
+                plc.name as plc_name,
         		hour(end) as time_hour, 
+        		day_of_month(end) as time_day_of_month, 
         		day_of_year(end) as time_day, 
         		month(end) as time_month, 
         		year(end) as time_year
             from plc_event
-            where start <= {start} and end <= {end}
-          group by %s""".format(group))()
+            inner join plc on plc.id=plc_event.plc
+            where end >= {start} and end <= {end}
+        	group by
+              plc.id,
+    		  plc.name,
+              hour(end),
+        	  day_of_month(end),
+              day_of_year(end),
+              month(end),
+              year(end)
+        	order by 
+    		  year(end) desc, 
+    		  month(end) desc,
+    		  day_of_year(end) desc,
+    		  hour(end) desc
+              """)
+            .on("start" -> start, "end" -> end)()
 
           rows.map { row =>
-            new TimelyConsumptionRow(
-              row[Long]("plc"),
-              row[Long]("usage"),
-              row[Long]("hour"),
-              row[Long]("dayOfYear"),
-              row[Long]("month"),
-              row[Long]("yeah"))
+              val map = new LinkedHashMap[String, Any]()
+	          map.put("PLC #", row[Long]("plc_id"))
+	          map.put("PLC Name", row[String]("plc_name"))
+	          map.put("Usage", row[BigDecimal]("usage_sum").longValue)
+	          map.put("Hour", row[Long]("time_hour"))
+	          map.put("Day", row[Long]("time_day_of_month"))
+	          map.put("Month", row[Long]("time_month"))
+	          map.put("Year", row[Long]("time_year"))
+	          map
+          }.toList
+        }
+
+        def daily() = {
+          println("start", start)
+          println("end", end)
+          val rows = SQL(
+            """select 
+        		sum(usage) as usage_sum,
+        		plc.id as plc_id,
+        		plc.name as plc_name,
+        		hour(end) as time_hour, 
+        		day_of_year(end) as time_day,
+        		day_of_month(end) as time_day_of_month,
+        		month(end) as time_month, 
+        		year(end) as time_year
+            from plc_event
+            inner join plc on plc.id=plc_event.plc
+            where end >= {start} and end <= {end}
+        	group by
+              plc.id,
+    		  plc.name,
+              hour(end),
+              day_of_year(end),
+              day_of_month(end),
+              month(end),
+              year(end)
+        	order by
+    		  year(end) desc,
+    		  month(end) desc,
+    		  day_of_year(end) desc,
+    		  hour(end) desc
+              """)
+            .on("start" -> start, "end" -> end)()
+
+          rows.map { row =>
+            val map = new LinkedHashMap[String, Any]()
+              map.put("PLC #", row[Long]("plc_id"))
+              map.put("PLC Name", row[String]("plc_name"))
+              map.put("Usage", row[BigDecimal]("usage_sum").longValue)
+              map.put("Day", row[Long]("time_day_of_month"))
+              map.put("Month", row[Long]("time_month"))
+              map.put("Year", row[Long]("time_year"))
+              map
+          }.toList
+        }
+
+        def monthly() = {
+          val rows = SQL(
+            """select 
+        		sum(usage) as usage_sum,
+        		plc.id as plc_id,
+        		plc.name as plc_name,
+        		month(end) as time_month, 
+        		year(end) as time_year
+            from plc_event
+        	inner join plc on plc.id=plc_event.plc
+            where end >= {start} and end <= {end}
+        	group by 
+              plc.id,
+        	  plc.name,
+              month(end),
+              year(end)
+        	order by
+    		  year(end),
+    		  month(end)
+              """)
+            .on("start" -> start, "end" -> end)()
+
+          rows.map { row =>
+              val map = new LinkedHashMap[String, Any]()
+              map.put("PLC #", row[Long]("plc_id"))
+              map.put("PLC Name", row[String]("plc_name"))
+              map.put("Usage", row[BigDecimal]("usage_sum").longValue)
+              map.put("Month", row[Long]("time_month"))
+              map.put("Year", row[Long]("time_year"))
+              map
           }.toList
         }
 
         style match {
+          case ListTimelyReport.TOTAL =>
+            total
           case ListTimelyReport.HOURLY =>
-            query("hour(end)")
+            hourly
           case ListTimelyReport.DAILY =>
-            query("day_of_year(end)")
+            daily
           case ListTimelyReport.MONTHLY =>
-            query("month(end)")
+            monthly
           case _ =>
-            query("month(end)")
+            monthly
         }
     }
   }
@@ -185,8 +310,8 @@ trait PlcRepo {
 	  			and
 	      			plc.id = {plcId}
      	""")
-     	.on("plcId" -> plcId)
-        .as(scalar[Long].single)
+          .on("plcId" -> plcId)
+          .as(scalar[Long].single)
     }
   }
 
@@ -203,11 +328,20 @@ trait PlcRepo {
   def getSetting(key: String, defaultValue: String): String = {
     DB.withConnection {
       implicit c =>
-        val value = SQL("select value from plc_setting where key={key}")
-          .on("key" -> key)
-          .as(scalar[String].single)
-
-        if (value == null) defaultValue else value
+        try {
+        	val value = SQL("select value from plc_setting where key={key}")
+    			.on("key" -> key)
+    			.as(scalar[String].single)
+          
+			if (value == null) defaultValue else value
+        } catch {
+          case e: SqlMappingError =>
+            // In the case of the setting not existing in the DB
+            defaultValue
+          case e: Exception =>
+            e.printStackTrace()
+            defaultValue
+        }
     }
   }
 

@@ -1,27 +1,31 @@
-@(reportForm: Form[org.sh.plc.server.model.TotalConsumptionModel])
-
-@import helper._
-@import helper.twitterBootstrap._
+@(start: String, end: String, errors: String)
 
 @main("Total Consumption Report") {
 
-    @if(loginForm.hasErrors) {
+    @if(!errors.isEmpty()) {
         <div class="alert-message error">
-            <p><strong>Oops</strong> Please fix all errors</p>
+            <p><strong>Oops</strong>Please fix all errors</p>
+            <p>@errors</p>
         </div>
     }
     
-    @helper.form(action = routes.Plc.submitTotalConsumption) {
+    <form method="GET" action="/report/totalConsumption">
 		<fieldset>
-			<legend>Email - Hourly Threshold Reached</legend>
-			@inputText(
-			    loginForm("email"), 
-			    '_label -> "Email"
-			)
+			<legend>Options</legend>
+			<table>
+				<tr>
+					<td><span>After</span></td>
+					<td><input type="text" name="start" value="@start" /></td>
+				</tr>
+				<tr>
+					<td><span>Before</span></td>
+					<td><input type="text" name="end" value="@end" /></td>
+				</tr>
+			</table>
         </fieldset>
         
         <div class="actions">
             <input type="submit" class="btn primary" value="Generate">
         </div>
-     }
+    </form>
 }

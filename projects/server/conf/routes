@@ -3,7 +3,8 @@
 # ~~~~
 
 GET     /                           					controllers.Plc.index
-GET     /report/totalConsumption		controllers.Plc.totalConsumption
+GET     /report/totalConsumption		controllers.Plc.totalConsumption(start: String, end: String)
+GET     /report/intervalConsumption	controllers.Plc.intervalConsumptionReport(start: String, end: String, interval: Int)
 GET     /plc/settings                           	controllers.Plc.settings
 GET     /plc/settings/submit					controllers.Plc.submitSettings
 

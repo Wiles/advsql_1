@@ -33,13 +33,6 @@ object Global extends GlobalSettings {
 
   override def onStart(app: Application) {
     JobScheduler.onStart(app)
-    /*
-    var worker = new PlcWorker()
-    Akka.system.scheduler.schedule(0 seconds, 60 seconds)({
-    	val plcs = PlcServices.listPlcs()
-        plcs.map(new PlcCommunicator().energyUsage(_))
-    })
-    */
     DatabaseSetup.onStart(app)
   }
   

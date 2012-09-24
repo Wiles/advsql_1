@@ -74,7 +74,7 @@ class PlcCommunicator {
         new OutputStreamWriter(socket.getOutputStream()))
 
       Logger.debug("a")
-      val requestContents = "R|%d".format(plcId)
+      val requestContents = "R|%d\r\n".format(plcId)
       out.write(requestContents)
       Logger.debug("b")
       out.flush()

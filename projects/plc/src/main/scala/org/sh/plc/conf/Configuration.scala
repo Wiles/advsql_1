@@ -25,6 +25,7 @@ sealed trait ConfigurationValues {
   var verbose = false
   var port = 9005
   var rates = Array(100.0, 100.0, 100.0)
+  var failureRate = 100
 }
 
 /**
@@ -66,7 +67,18 @@ private class ConfigurationReader(val file: File) extends ConfigurationValues {
         Logger.log(e, "[Configuration] Failure to parse rates")
       }
     }
+    
+    try {
+      if (props.getProperty("failureRate") != "null") {
+    	  c.failureRate = math.abs(props.getProperty("failureRate").toInt)
+      }
+    } catch {
+      case e: Exception => {
+        Logger.log(e, "[Configuration] Failure to parse failure rates")
+      }
+    }
     Logger.log("[Configuration] %d plcs running at tick rates %s".format(c.rates.length, c.rates.mkString(" ")))
+    Logger.log("[Configuration] Failure rate 1 request in every %d across all PLCs.".format(c.failureRate))
   }
 
   /**

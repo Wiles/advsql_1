@@ -10,6 +10,7 @@
 package org.sh.plc.server
 
 import scala.util.Random
+import org.sh.plc.conf.Configuration
 
 import org.sh.plc.manager.PlcManagerComponent
 
@@ -72,7 +73,7 @@ trait SocketProcessorComponent extends PlcManagerComponent {
           val command = query(0)
           val plc = query(1).toInt - 1
           if (command == "R") {
-            if (Random.nextInt % 100 == 0) {
+            if (Configuration.failureRate != 0 && Random.nextInt % Configuration.failureRate == 0) {
               // Send an error response on every 100th request
               errorResponse()
             } else {

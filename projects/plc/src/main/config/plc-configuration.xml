@@ -4,4 +4,6 @@
 	<entry key="verbose">false</entry>
 	<entry key="port">9015</entry>
 	<entry key="rates">150.0, 15, 10.5</entry>
+	<entry key="failureRate">100</entry>
+	
 </properties>

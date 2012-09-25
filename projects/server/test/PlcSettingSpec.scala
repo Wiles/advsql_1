@@ -1,4 +1,4 @@
-import org.sh.plc.server.jobs._
+import org.sh.plc.server.jobs.DatabaseSetup
 import org.sh.plc.server.services._
 import org.specs2.mutable._
 import play.api.test._

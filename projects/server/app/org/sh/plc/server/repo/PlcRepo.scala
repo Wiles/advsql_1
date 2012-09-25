@@ -44,7 +44,7 @@ trait PlcRepo {
     DB.withConnection {
       implicit c =>
         SQL("""
-               insert into plc_event(plc, status, usage, end)
+               insert into plc_event(plc, status, usage, created)
                values({plc}, {status}, {usage}, CURRENT_TIMESTAMP())""")
           .on("plc" -> usage.plc)
           .on("status" -> DatabaseSetupConstants.statuses("Valid"))
@@ -52,7 +52,7 @@ trait PlcRepo {
           .executeInsert()
     }
   }
-  
+
   /**
    * Log a failure event
    */
@@ -86,10 +86,10 @@ trait PlcRepo {
   /**
    * List statuses
    */
-  def listPlcStatuses(): Array[PlcStatusModel] = {
+  def listRecentPlcStatuses(limit: Int = 50): Array[PlcStatusModel] = {
     DB.withConnection {
       implicit c =>
-        SQL("""
+        val rows = SQL("""
   				select 
         			max(pe.created) as max_created,
   					plc.id as id, 
@@ -110,8 +110,12 @@ trait PlcRepo {
         			pe.usage, 
         			pe.created,
         			ptotal.total
-        		limit 50
-  			""")().map { row =>
+        		order by pe.created desc
+        		limit {limit}
+  			""")
+          .on("limit" -> limit)()
+
+        rows.map { row =>
           new PlcStatusModel(
             row[Long]("id"),
             row[String]("name"),
@@ -147,7 +151,7 @@ trait PlcRepo {
         		  created <= {end}
     		  group by 
         		  plc.id, plc.name""")
-    	.on("start" -> start, "end" -> end)()
+            .on("start" -> start, "end" -> end)()
 
           rows.map { row =>
             val map = new LinkedHashMap[String, Any]()
@@ -189,21 +193,19 @@ trait PlcRepo {
             .on("start" -> start, "end" -> end)()
 
           rows.map { row =>
-              val map = new LinkedHashMap[String, Any]()
-	          map.put("PLC #", row[Long]("plc_id"))
-	          map.put("PLC Name", row[String]("plc_name"))
-	          map.put("Usage", row[BigDecimal]("usage_sum").longValue)
-	          map.put("Hour", row[Long]("time_hour"))
-	          map.put("Day", row[Long]("time_day_of_month"))
-	          map.put("Month", row[Long]("time_month"))
-	          map.put("Year", row[Long]("time_year"))
-	          map
+            val map = new LinkedHashMap[String, Any]()
+            map.put("PLC #", row[Long]("plc_id"))
+            map.put("PLC Name", row[String]("plc_name"))
+            map.put("Usage", row[BigDecimal]("usage_sum").longValue)
+            map.put("Hour", row[Long]("time_hour"))
+            map.put("Day", row[Long]("time_day_of_month"))
+            map.put("Month", row[Long]("time_month"))
+            map.put("Year", row[Long]("time_year"))
+            map
           }.toList
         }
 
         def daily() = {
-          println("start", start)
-          println("end", end)
           val rows = SQL(
             """select 
         		sum(usage) as usage_sum,
@@ -235,13 +237,13 @@ trait PlcRepo {
 
           rows.map { row =>
             val map = new LinkedHashMap[String, Any]()
-              map.put("PLC #", row[Long]("plc_id"))
-              map.put("PLC Name", row[String]("plc_name"))
-              map.put("Usage", row[BigDecimal]("usage_sum").longValue)
-              map.put("Day", row[Long]("time_day_of_month"))
-              map.put("Month", row[Long]("time_month"))
-              map.put("Year", row[Long]("time_year"))
-              map
+            map.put("PLC #", row[Long]("plc_id"))
+            map.put("PLC Name", row[String]("plc_name"))
+            map.put("Usage", row[BigDecimal]("usage_sum").longValue)
+            map.put("Day", row[Long]("time_day_of_month"))
+            map.put("Month", row[Long]("time_month"))
+            map.put("Year", row[Long]("time_year"))
+            map
           }.toList
         }
 
@@ -268,13 +270,13 @@ trait PlcRepo {
             .on("start" -> start, "end" -> end)()
 
           rows.map { row =>
-              val map = new LinkedHashMap[String, Any]()
-              map.put("PLC #", row[Long]("plc_id"))
-              map.put("PLC Name", row[String]("plc_name"))
-              map.put("Usage", row[BigDecimal]("usage_sum").longValue)
-              map.put("Month", row[Long]("time_month"))
-              map.put("Year", row[Long]("time_year"))
-              map
+            val map = new LinkedHashMap[String, Any]()
+            map.put("PLC #", row[Long]("plc_id"))
+            map.put("PLC Name", row[String]("plc_name"))
+            map.put("Usage", row[BigDecimal]("usage_sum").longValue)
+            map.put("Month", row[Long]("time_month"))
+            map.put("Year", row[Long]("time_year"))
+            map
           }.toList
         }
 
@@ -314,6 +316,47 @@ trait PlcRepo {
           .as(scalar[Long].single)
     }
   }
+  
+  /**
+   * List all plc events
+   * @return
+   */
+  def listPlcEvents(): List[LinkedHashMap[String, Any]] = {
+    DB.withConnection {
+      implicit c =>
+        val rows = SQL("""
+      	    select
+      			plc.id as id,
+        		plc.name as name,
+        		ps.name as status,
+        		pe.usage as usage,
+        		pe.created as created
+      	    from plc_event pe
+    		inner join plc on plc.id=pe.plc
+            inner join plc_status ps on ps.id=pe.status
+     	""")()
+     	
+     	rows.map { row =>
+          val map = new LinkedHashMap[String, Any]()
+          map.put("PLC #", row[Long]("id"))
+          map.put("PLC Name", row[String]("name"))
+          map.put("Status", row[String]("status"))
+          map.put("Usage", row[Long]("usage"))
+          map.put("Created", row[Date]("created"))
+          map
+        }.toList
+    }
+  }
+  
+  /**
+   * Delete all rows from the Plc events table
+   */
+  def deletePlcEvents(): Unit = {
+    DB.withConnection {
+      implicit c =>
+        SQL("delete from plc_event").execute()
+    }
+  }
 
   /**
    * Get a setting from the database.
@@ -329,11 +372,11 @@ trait PlcRepo {
     DB.withConnection {
       implicit c =>
         try {
-        	val value = SQL("select value from plc_setting where key={key}")
-    			.on("key" -> key)
-    			.as(scalar[String].single)
-          
-			if (value == null) defaultValue else value
+          val value = SQL("select value from plc_setting where key={key}")
+            .on("key" -> key)
+            .as(scalar[String].single)
+
+          if (value == null) defaultValue else value
         } catch {
           case e: SqlMappingError =>
             // In the case of the setting not existing in the DB

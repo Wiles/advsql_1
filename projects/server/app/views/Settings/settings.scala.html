@@ -13,18 +13,34 @@
     
     @helper.form(action = routes.SettingsController.submitSettings) {
 		<fieldset>
-			<legend>Email - Hourly Threshold Reached</legend>
-			@inputText(
-			    loginForm("email"), 
-			    '_label -> "Email"
-			)
-			
-			@inputText(
-			    loginForm("hourlyEnergyThreshold"), 
-			    '_label -> "Hourly Energy Threshold"
-			)
+			<legend>Email</legend>
+			<fieldset>
+				<legend>Hourly Threshold Reached</legend>
+				@inputText(
+				    loginForm("email"), 
+				    '_label -> "Email"
+				)
+				
+				@inputText(
+				    loginForm("hourlyEnergyThreshold"), 
+				    '_label -> "Hourly Energy Threshold"
+				)
+	        </fieldset>
         </fieldset>
         
+        <fieldset>
+			<legend>Data</legend>
+	        <fieldset>
+				<legend>Export</legend>
+				<a href="@routes.ReportsController.generateExcelPlcEvents()">All Plc Usage</a>
+			</fieldset>
+	        <fieldset>
+				<legend>Delete</legend>
+				<a href="@routes.SettingsController.deletePlcEvents()" 
+					onclick="return confirm('WARNING: Continuing will immediately delete all usage data. This is no way to undo this action.')">All Plc Usage</a>
+			</fieldset>
+		</fieldset>
+        <h1></h1>
         <div class="actions">
             <input type="submit" class="btn primary" value="Save Changes">
         </div>

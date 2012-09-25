@@ -28,15 +28,13 @@ import org.sh.plc.server.services.PlcServiceComponent
 /**
  * Provide an interface to communicate with a Plc
  */
-class PlcCommunicator extends PlcServiceComponent {
+class PlcCommunicator(val address: String, val port: Int) extends PlcServiceComponent {
 
   /**
    * Delimiter for response values from the PLC server
    */
   val Delimiter = "\\|"
 
-  val DefaultHost = "127.0.0.1"
-  val DefaultPort = 9999
   val DefaultTimeout = 30000 // milliseconds
 
   /**
@@ -50,20 +48,9 @@ class PlcCommunicator extends PlcServiceComponent {
     var socket: Socket = null
 
     try {
-      val configuration = Play.application.configuration
-
-      val address = configuration.getString("oplc_server_address").getOrElse({
-        // TODO: Fix continual warning that will annoy users/admins...
-        Logger.warn("Failure to find oplc_server_address configured in Play Application. Using %s".format(DefaultHost))
-        "localhost"
-      })
-
-      val port = configuration.getInt("oplc_server_port").getOrElse({
-        // TODO: Fix continual warning that will annoy users/admins...
-        Logger.warn("Failure to find oplc_server_port configured in Play Application. Using %d".format(DefaultPort))
-        DefaultPort
-      })
-
+      /**
+       * TODO: Do not reconnect on every request
+       */
       socket = new Socket()
       socket.connect(new InetSocketAddress(address, port), DefaultTimeout)
 

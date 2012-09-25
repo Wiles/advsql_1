@@ -16,6 +16,9 @@ import scala.util.control.Exception._
 object SettingsController extends Controller with PlcServiceComponent {
   /**
    * Settings form
+   * 
+   * TODO: Make this a POST message, because it could break the program on very long email addresses
+   * depending on some browsers.
    */
   val settingsForm: Form[SettingModel] = Form(
     // Defines a mapping that will handle Contact values
@@ -60,5 +63,13 @@ object SettingsController extends Controller with PlcServiceComponent {
 
         Ok(html.Settings.settings(settingsForm.fill(settingsModel)))
       })
+  }
+  
+  /**
+   * Delete every Plc event
+   */
+  def deletePlcEvents = Action {
+    plcService.deletePlcEvents()
+    Redirect(routes.SettingsController.settings())
   }
 }

@@ -3,9 +3,13 @@
 # ~~~~
 
 GET     /                           	controllers.Application.index
-GET     /report/totalConsumption		controllers.ReportsController.generateReport(start: String, end: String, report: Int)
+GET     /report/index					controllers.ReportsController.generateReport(start: String, end: String, report: Int)
+GET     /report/excel					controllers.ReportsController.generateExcelReport(start: String, end: String, report: Int)
+GET     /report/json					controllers.ReportsController.generateJsonReport(start: String, end: String, report: Int)
+GET     /report/excel/plcEvents			controllers.ReportsController.generateExcelPlcEvents
 GET     /plc/settings                   controllers.SettingsController.settings
 GET     /plc/settings/submit			controllers.SettingsController.submitSettings
+GET     /plc/settings/delete/plc/events	controllers.SettingsController.deletePlcEvents
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

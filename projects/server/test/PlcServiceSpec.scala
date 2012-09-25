@@ -19,9 +19,18 @@ import org.sh.plc.server.repo._
 
 class PlcServiceSpec extends Specification with Before with PlcServiceComponent {
 
+  // Play is being stupid and giving a NoClassDefError :/
+  // All tests are broken on my machine...
+
   def before() = {
     running(FakeApplication()) {
-      DatabaseSetup.setup()
+      try {
+        DatabaseSetup.setup()
+      } catch {
+        case e: Exception =>
+          e.printStackTrace()
+          throw e
+      }
     }
   }
 
@@ -41,19 +50,15 @@ class PlcServiceSpec extends Specification with Before with PlcServiceComponent 
 
     "logged" in {
       running(FakeApplication()) {
-        val start = new GregorianCalendar()
-        start.add(Calendar.HOUR, -5)
-
         val usage = new EnergyUsage(1, 50,
-          new Timestamp(start.getTime().getTime()),
           new Timestamp(Calendar.getInstance().getTime().getTime()))
 
-        PlcServices.logEnergyUsage(usage)
+        plcService.logEnergyUsage(usage)
 
         true
       }
     }
-    
+
     "be reported totally" in {
       running(FakeApplication()) {
         val start = new GregorianCalendar()
@@ -65,7 +70,7 @@ class PlcServiceSpec extends Specification with Before with PlcServiceComponent 
 
         println(items)
         true
-      }      
+      }
     }
 
     "be reported daily" in {

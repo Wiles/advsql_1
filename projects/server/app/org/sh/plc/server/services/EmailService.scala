@@ -1,3 +1,11 @@
+/**
+ * PROJECT: Advanced SQL #1
+ * PROGRAMMER: Hekar Khani
+ * FIRST VERSION: September 21, 2012
+ * DESCRIPTION:
+ * 	Email services
+ */
+
 package org.sh.plc.server.services
 
 import play.api._

@@ -16,7 +16,7 @@ object Application extends Controller with PlcServiceComponent {
    */
   def index = Action {
     val plcs = plcService.listPlcs()
-    val plcStatuses = plcService.listPlcStatuses()
+    val plcStatuses = plcService.listRecentPlcStatuses()
     val dateFormat = new SimpleDateFormat()
 
     Ok(html.Plc.index(plcs, plcStatuses, dateFormat))

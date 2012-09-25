@@ -33,7 +33,7 @@ object DatabaseSetupConstants {
 	  plc long references plc(id),
 	  status long references plc_status(id),
       usage long not null,
-	  end timestamp not null
+	  created timestamp not null
       	""",
 
     "plc_setting" ->

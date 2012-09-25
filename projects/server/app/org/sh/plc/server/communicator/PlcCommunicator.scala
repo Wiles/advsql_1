@@ -9,21 +9,26 @@
 
 package org.sh.plc.server.communicator
 
-import scala.util.control.Exception._
-import play.api._
-import play.api.Play._
 import java.io._
 import java.net._
+
 import java.sql.Timestamp
+
 import java.util.Date
-import org.sh.plc.server.model.EnergyUsage
-import org.sh.plc.server.services.PlcServices
 import java.util.Calendar
+
+import scala.util.control.Exception._
+
+import play.api._
+import play.api.Play._
+
+import org.sh.plc.server.model.EnergyUsage
+import org.sh.plc.server.services.PlcServiceComponent
 
 /**
  * Provide an interface to communicate with a Plc
  */
-class PlcCommunicator {
+class PlcCommunicator extends PlcServiceComponent {
 
   /**
    * Delimiter for response values from the PLC server
@@ -37,9 +42,7 @@ class PlcCommunicator {
   /**
    * Get the energy usage for a PLC
    */
-  def energyUsage(plcId: Long): Unit = {
-
-    Logger.debug("Bob")
+  def pollAndUpdateDatabase(plcId: Long): Unit = {
 
     // Stupid Scala library doesn't have 'using' statement...
     var in: BufferedReader = null
@@ -88,9 +91,9 @@ class PlcCommunicator {
         
         val energyUsage = new EnergyUsage(plcId, usage, currentTimestamp)
         
-        PlcServices.logEnergyUsage(energyUsage)
+        plcService.logEnergyUsage(energyUsage)
       } else {
-        PlcServices.logFailureEvent(plcId, currentTimestamp)
+        plcService.logFailureEvent(plcId, currentTimestamp)
       }
       
     } finally {

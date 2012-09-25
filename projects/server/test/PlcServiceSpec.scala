@@ -12,12 +12,12 @@ import java.sql.Timestamp
 import org.specs2.mutable._
 import play.api.test._
 import play.api.test.Helpers._
-import org.sh.plc.server.jobs.DatabaseSetup
-import org.sh.plc.server.model.EnergyUsage
-import org.sh.plc.server.services.PlcServices
-import org.sh.plc.server.repo.ListTimelyReport
+import org.sh.plc.server.jobs._
+import org.sh.plc.server.model._
+import org.sh.plc.server.services._
+import org.sh.plc.server.repo._
 
-class PlcServiceSpec extends Specification with Before {
+class PlcServiceSpec extends Specification with Before with PlcServiceComponent {
 
   def before() = {
     running(FakeApplication()) {
@@ -28,7 +28,7 @@ class PlcServiceSpec extends Specification with Before {
   "plcs" should {
     "be listed" in {
       running(FakeApplication()) {
-        val plcs = PlcServices.listPlcs()
+        val plcs = plcService.listPlcs()
 
         assert(plcs.size == 3)
         assert(plcs(0) == 1)
@@ -59,7 +59,7 @@ class PlcServiceSpec extends Specification with Before {
         val start = new GregorianCalendar()
         start.add(Calendar.HOUR, -5)
 
-        val items = PlcServices.listTimelyConsumption(ListTimelyReport.TOTAL,
+        val items = plcService.listTimelyConsumption(ListTimelyReport.TOTAL,
           new Timestamp(start.getTime().getTime()),
           new Timestamp(Calendar.getInstance().getTime().getTime()))
 
@@ -73,7 +73,7 @@ class PlcServiceSpec extends Specification with Before {
         val start = new GregorianCalendar()
         start.add(Calendar.HOUR, -5)
 
-        val items = PlcServices.listTimelyConsumption(ListTimelyReport.DAILY,
+        val items = plcService.listTimelyConsumption(ListTimelyReport.DAILY,
           new Timestamp(start.getTime().getTime()),
           new Timestamp(Calendar.getInstance().getTime().getTime()))
 
@@ -87,7 +87,7 @@ class PlcServiceSpec extends Specification with Before {
         val start = new GregorianCalendar()
         start.add(Calendar.HOUR, -5)
 
-        val items = PlcServices.listTimelyConsumption(ListTimelyReport.MONTHLY,
+        val items = plcService.listTimelyConsumption(ListTimelyReport.MONTHLY,
           new Timestamp(start.getTime().getTime()),
           new Timestamp(Calendar.getInstance().getTime().getTime()))
 
@@ -101,7 +101,7 @@ class PlcServiceSpec extends Specification with Before {
         val start = new GregorianCalendar()
         start.add(Calendar.HOUR, -5)
 
-        val items = PlcServices.listTimelyConsumption(ListTimelyReport.HOURLY,
+        val items = plcService.listTimelyConsumption(ListTimelyReport.HOURLY,
           new Timestamp(start.getTime().getTime()),
           new Timestamp(Calendar.getInstance().getTime().getTime()))
 

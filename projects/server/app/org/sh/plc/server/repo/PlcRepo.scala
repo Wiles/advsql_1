@@ -60,7 +60,7 @@ trait PlcRepo {
     DB.withConnection {
       implicit c =>
         SQL("""
-               insert into plc_event(plc, status, usage, end)
+               insert into plc_event(plc, status, usage, created)
                values({plc}, {status}, {usage}, CURRENT_TIMESTAMP())""")
           .on("plc" -> plcId)
           .on("status" -> DatabaseSetupConstants.statuses("Failure"))
@@ -91,11 +91,11 @@ trait PlcRepo {
       implicit c =>
         SQL("""
   				select 
-        			max(pe.end) as max_end,
+        			max(pe.created) as max_created,
   					plc.id as id, 
   					plc.name as name,
   					ps.name as status,
-        			FORMATDATETIME(pe.end, 'd/MM/yyyy HH:mm') as end,
+        			FORMATDATETIME(pe.created, 'd/MM/yyyy HH:mm') as created,
   					pe.usage as usage,
   					ptotal.total as total
   				from plc
@@ -108,7 +108,7 @@ trait PlcRepo {
         			plc.name,
         			ps.name,
         			pe.usage, 
-        			pe.end,
+        			pe.created,
         			ptotal.total
         		limit 50
   			""")().map { row =>
@@ -116,7 +116,7 @@ trait PlcRepo {
             row[Long]("id"),
             row[String]("name"),
             row[String]("status"),
-            row[String]("end"),
+            row[String]("created"),
             row[Long]("usage"),
             row[BigDecimal]("total"))
         }.toArray
@@ -142,9 +142,9 @@ trait PlcRepo {
               from plc_event
               inner join plc on plc.id=plc_event.plc
     		  where 
-        		  end >= {start}
+        		  created >= {start}
               and
-        		  end <= {end}
+        		  created <= {end}
     		  group by 
         		  plc.id, plc.name""")
     	.on("start" -> start, "end" -> end)()
@@ -164,27 +164,27 @@ trait PlcRepo {
         		sum(usage) as usage_sum,
         		plc.id as plc_id,
                 plc.name as plc_name,
-        		hour(end) as time_hour, 
-        		day_of_month(end) as time_day_of_month, 
-        		day_of_year(end) as time_day, 
-        		month(end) as time_month, 
-        		year(end) as time_year
+        		hour(created) as time_hour, 
+        		day_of_month(created) as time_day_of_month, 
+        		day_of_year(created) as time_day, 
+        		month(created) as time_month, 
+        		year(created) as time_year
             from plc_event
             inner join plc on plc.id=plc_event.plc
-            where end >= {start} and end <= {end}
+            where created >= {start} and created <= {end}
         	group by
               plc.id,
     		  plc.name,
-              hour(end),
-        	  day_of_month(end),
-              day_of_year(end),
-              month(end),
-              year(end)
+              hour(created),
+        	  day_of_month(created),
+              day_of_year(created),
+              month(created),
+              year(created)
         	order by 
-    		  year(end) desc, 
-    		  month(end) desc,
-    		  day_of_year(end) desc,
-    		  hour(end) desc
+    		  year(created) desc, 
+    		  month(created) desc,
+    		  day_of_year(created) desc,
+    		  hour(created) desc
               """)
             .on("start" -> start, "end" -> end)()
 
@@ -209,27 +209,27 @@ trait PlcRepo {
         		sum(usage) as usage_sum,
         		plc.id as plc_id,
         		plc.name as plc_name,
-        		hour(end) as time_hour, 
-        		day_of_year(end) as time_day,
-        		day_of_month(end) as time_day_of_month,
-        		month(end) as time_month, 
-        		year(end) as time_year
+        		hour(created) as time_hour, 
+        		day_of_year(created) as time_day,
+        		day_of_month(created) as time_day_of_month,
+        		month(created) as time_month, 
+        		year(created) as time_year
             from plc_event
             inner join plc on plc.id=plc_event.plc
-            where end >= {start} and end <= {end}
+            where created >= {start} and created <= {end}
         	group by
               plc.id,
     		  plc.name,
-              hour(end),
-              day_of_year(end),
-              day_of_month(end),
-              month(end),
-              year(end)
+              hour(created),
+              day_of_year(created),
+              day_of_month(created),
+              month(created),
+              year(created)
         	order by
-    		  year(end) desc,
-    		  month(end) desc,
-    		  day_of_year(end) desc,
-    		  hour(end) desc
+    		  year(created) desc,
+    		  month(created) desc,
+    		  day_of_year(created) desc,
+    		  hour(created) desc
               """)
             .on("start" -> start, "end" -> end)()
 
@@ -251,19 +251,19 @@ trait PlcRepo {
         		sum(usage) as usage_sum,
         		plc.id as plc_id,
         		plc.name as plc_name,
-        		month(end) as time_month, 
-        		year(end) as time_year
+        		month(created) as time_month, 
+        		year(created) as time_year
             from plc_event
         	inner join plc on plc.id=plc_event.plc
-            where end >= {start} and end <= {end}
+            where created >= {start} and created <= {end}
         	group by 
               plc.id,
         	  plc.name,
-              month(end),
-              year(end)
+              month(created),
+              year(created)
         	order by
-    		  year(end),
-    		  month(end)
+    		  year(created),
+    		  month(created)
               """)
             .on("start" -> start, "end" -> end)()
 
@@ -306,7 +306,7 @@ trait PlcRepo {
       	    from plc_event pe
         		inner join plc on plc.id=pe.plc
       	    where
-	      			end >= dateadd(hour, -1, current_timestamp())
+	      			created >= dateadd(hour, -1, current_timestamp())
 	  			and
 	      			plc.id = {plcId}
      	""")

@@ -1,5 +1,5 @@
-import org.sh.plc.server.jobs.DatabaseSetup
-import org.sh.plc.server.services.PlcServices
+import org.sh.plc.server.jobs._
+import org.sh.plc.server.services._
 import org.specs2.mutable._
 import play.api.test._
 import play.api.test.Helpers._
@@ -12,7 +12,7 @@ import play.api.test.Helpers._
  * DESCRIPTION:
  *
  */
-class PlcSettingSpec extends Specification with Before {
+class PlcSettingSpec extends Specification with Before with PlcServiceComponent {
   def before() = {
     running(FakeApplication()) {
       DatabaseSetup.setup()
@@ -22,8 +22,8 @@ class PlcSettingSpec extends Specification with Before {
   "settings" should {
     "be saved" in {
       running(FakeApplication()) {
-        PlcServices.putSetting("Bob", "Bill")
-        val setting = PlcServices.getSetting("Bob", "Joe")
+        plcService.putSetting("Bob", "Bill")
+        val setting = plcService.getSetting("Bob", "Joe")
 
         assert(setting != "Joe")
         assert(setting == "Bill")

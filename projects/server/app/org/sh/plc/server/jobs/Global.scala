@@ -10,9 +10,6 @@ package org.sh.plc.server.jobs
 import scala.Array.canBuildFrom
 import scala.annotation.implicitNotFound
 
-import org.sh.plc.server.communicator.PlcCommunicator
-import org.sh.plc.server.services.PlcServices
-
 import akka.util.duration.intToDurationInt
 import play.api.Application
 import play.api.GlobalSettings

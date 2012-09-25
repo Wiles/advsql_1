@@ -24,9 +24,9 @@
 <body>
 	<div class="nav">
 		<ul class="nav">
-			<li class="nav"><a href="@routes.Plc.index()">Home</a></li>
-			<li class="nav"><a href="@routes.Plc.totalConsumption("", "", 0)">Consumption Reports</a></li>
-			<li class="nav"><a href="@routes.Plc.settings()">Settings</a></li>
+			<li class="nav"><a href="@routes.Application.index()">Home</a></li>
+			<li class="nav"><a href="@routes.ReportsController.generateReport("", "", 0)">Consumption Reports</a></li>
+			<li class="nav"><a href="@routes.SettingsController.settings()">Settings</a></li>
 		</ul>
 	</div>
 	<div class="header">

@@ -9,13 +9,12 @@
 package org.sh.plc.server.jobs
 
 import play.api._
-
 import org.quartz._
 import org.quartz.JobBuilder.newJob
 import org.quartz.SimpleScheduleBuilder.simpleSchedule
 import org.quartz.TriggerBuilder.newTrigger
 import org.sh.plc.server.communicator.PlcCommunicator
-import org.sh.plc.server.services.PlcServices
+import org.sh.plc.server.services.PlcServiceComponent
 
 /**
  * Helper for job bean
@@ -65,16 +64,16 @@ object PlcWorker {
  * Quartz job bean that handles the polling of the
  * plc server
  */
-class PlcWorker extends Job {
+class PlcWorker extends Job with PlcServiceComponent {
   /**
    * Execute and process the plc polling background job
    * @param context Quartz context
    */
   def execute(context: JobExecutionContext): Unit = {
     try {
-	    val plcs = PlcServices.listPlcs()
+	    val plcs = plcService.listPlcs()
 	    plcs.map { plc =>
-	    	new PlcCommunicator().energyUsage(plc.id)
+	    	new PlcCommunicator().pollAndUpdateDatabase(plc.id)
 		}
     } catch {
       case e: Exception =>
